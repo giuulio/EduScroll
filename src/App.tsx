@@ -5,7 +5,7 @@ import type {Paper,Detail} from './types';
 import {ensureVisual,illustrationFigure,fallbackSpec,type IllustrationSpec} from './visuals';
 
 function Logo({compact=false}:{compact?:boolean}){return <span className="logo"><span className="brand-mark" aria-hidden="true"><i/><i/><i/></span>{!compact&&<span>EduScroll<span className="logo-dot">.</span></span>}</span>;}
-function readSaved():Paper[]{try{const p=JSON.parse(localStorage.getItem('eduscroll-saved')??'[]');return Array.isArray(p)?p.filter(v=>v&&typeof v.id==='string'&&typeof v.headline==='string'&&typeof v.url==='string'&&v.url.startsWith('https://arxiv.org/abs/')).slice(0,500).map(ensureVisual):[];}catch{return [];}}
+function readSaved():Paper[]{try{const p=JSON.parse(localStorage.getItem('eduscroll-saved')??'[]');return Array.isArray(p)?p.filter(v=>v&&typeof v.id==='string'&&typeof v.headline==='string'&&typeof v.url==='string'&&v.url.startsWith('https://arxiv.org/abs/')).slice(0,500).map(p=>ensureVisual(demoPapers.find(d=>d.id===p.id)??p)):[];}catch{return [];}}
 function paperDate(s:string){return new Date(s).toLocaleDateString('en-GB',{day:'numeric',month:'short'});}
 function authorLine(p:Paper){return p.authors.length>2?`${p.authors[0]} + ${p.authors.length-1}`:p.authors.join(' & ');}
 function Sheet({children,close,label,wide=false}:{children:ReactNode;close:()=>void;label:string;wide?:boolean}){
@@ -42,7 +42,7 @@ export default function App(){
  async function openPaper(p:Paper,override?:'live'|'demo'){
  const run=++detailGeneration.current;setSelected(p);setDetailError('');setDetail(null);setDetailBusy(true);
  try{const currentMode=override??(view==='saved'?(await isLive()?'live':'demo'):mode);const key=`${currentMode}:${p.id}`;
- const data=detailCache.current.get(key)??await getDetail(p,currentMode);detailCache.current.set(key,data);if(run!==detailGeneration.current)return;setDetail(data);if(data.figure)setPapers(old=>old.map(x=>x.id===p.id?{...x,figure:data.figure}:x));}catch(e){if(run===detailGeneration.current)setDetailError((e as Error).message);}finally{if(run===detailGeneration.current)setDetailBusy(false);}}
+ const data=detailCache.current.get(key)??await getDetail(p,currentMode);detailCache.current.set(key,data);if(run!==detailGeneration.current)return;setDetail(data);}catch(e){if(run===detailGeneration.current)setDetailError((e as Error).message);}finally{if(run===detailGeneration.current)setDetailBusy(false);}}
  function closeDetail(){detailGeneration.current++;setSelected(null);setDetail(null);}
  function home(){generation.current++;setBusy(false);setView('home');setError('');setInput('');window.scrollTo({top:0});}
  async function checkLocal(){setConnection('Checking local backend…');try{setConnection(await isLive()?'Ready. Terra 6.1 will prepare your next feed.':'Add your key to .env, then restart npm run dev.');}catch{setConnection('Start npm run dev in ~/Developer/EduScroll to use live research.');}}
@@ -50,7 +50,7 @@ export default function App(){
  const list=view==='saved'?saved:papers;
  function card(p:Paper){const marked=saved.some(s=>s.id===p.id);return <article className="post" key={p.id}>
   <div className="post-content"><div className="post-byline"><a className="source-name" href={p.url} target="_blank" rel="noreferrer" aria-label="Open original publication">arXiv</a><span className="byline-category">{p.category}</span><span className="byline-dot">·</span><time dateTime={p.published}>{paperDate(p.published)}</time><span className="preprint">Preprint</span></div>
-   <button className="post-read" onClick={()=>void openPaper(p)} aria-label={`Read more: ${p.headline}`}><div className="post-copy"><h2>{p.headline}</h2><p>{p.summary}</p></div><Figure figure={p.figure??illustrationFigure(fallbackSpec(p))} illustration={fallbackSpec(p)}/></button>
+   <button className="post-read" onClick={()=>void openPaper(p)} aria-label={`Read more: ${p.headline}`}><div className="post-copy"><p>{p.summary}</p></div><Figure figure={p.figure??illustrationFigure(fallbackSpec(p))} illustration={fallbackSpec(p)}/></button>
    <div className="post-actions"><div className="post-footer-copy"><button className="read-more" onClick={()=>void openPaper(p)}>Read more</button><span className="post-tag">{p.tags[0]??p.category}</span></div><div className="post-tools"><button className={`icon-button ${marked?'is-saved':''}`} aria-label={marked?'Remove bookmark':'Bookmark paper'} aria-pressed={marked} onClick={()=>bookmark(p)}><Bookmark size={22} weight={marked?'Filled':'Outline'}/></button><button className="icon-button" aria-label="Share paper" onClick={()=>void share(p)}><Share size={22}/></button></div></div>
   </div></article>;}
  return <><header className="topbar"><button className="logo-button" onClick={home} aria-label="EduScroll home"><Logo/></button><div className="topbar-right">{view==='home'&&<button className="quiet-button saved-top" aria-label="Bookmarks" onClick={()=>{setView('saved');setError('');}}><Bookmark size={17}/> <span>Bookmarks</span>{saved.length>0&&<span className="count">{saved.length}</span>}</button>}<button className="icon-button settings-button" aria-label="Connection settings" onClick={()=>setSettings(true)}><Setting size={19}/></button></div></header>

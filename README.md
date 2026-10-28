@@ -4,7 +4,7 @@ Fresh research, a little easier to scroll.
 
 **[Public demo](https://giuulio.github.io/EduScroll/)** · React + TypeScript · GPT-6.1 Terra · arXiv
 
-Choose a topic, scroll through ten plain-English research cards, and open a paper for a deeper explanation. Bookmark discoveries, share original publications, and request another batch without repeats.
+Choose a topic, scroll through ten short research posts, and open a paper for a deeper explanation. Each post uses one or two simple sentences (at most 280 characters), followed by one full-width image. Bookmark discoveries, share original publications, and request another batch without repeats.
 
 The public GitHub Pages site serves a clearly labelled, curated demo collection of 20 real arXiv papers from 27 October 2026. **It cannot call your local inference server or spend your OpenAI credits.** Live generation runs only on your computer.
 
@@ -40,7 +40,7 @@ Do not put the key in frontend code, a `VITE_` variable, GitHub Actions, or GitH
 1. A topic and date range become a constrained arXiv API query.
 2. The server retrieves up to ten recent papers, using their original submission dates rather than version-update dates.
 3. HTML figures and captions are retrieved for every paper where available.
-4. GPT-6.1 Terra turns abstracts and supplied captions into schema-validated cards, and designs a paper-specific SVG concept illustration as a fallback. Every card has a visual: an original figure where suitable, or an explicitly labelled AI illustration. The same fallback covers source images that fail to load.
+4. Candidate images first pass a conservative caption check, then Terra inspects bounded image previews. Only a single, readable photo, plot or diagram may be selected. Dense architectures, multi-panel figures, tables and collages are rejected. Terra also writes the short post and designs a simple concept illustration as its labelled fallback.
 5. Opening a card fetches article text beyond the abstract. If HTML is unavailable, a PDF up to 12 MB is provided to the same model. The resulting explainer is cached.
 6. Another batch advances the source cursor and deduplicates paper versions. Fewer than ten cards are shown when fewer results exist; papers are never invented to fill a quota.
 
@@ -75,11 +75,11 @@ Pushes to `main` run `.github/workflows/pages.yml`: install, tests, production b
 - Initial live source: arXiv. Google Scholar has no bulk-access API and is not scraped.
 - “Today” uses UTC calendar dates. Publication labels on arXiv mean preprint submission, not journal publication.
 - Abstract-based cards and full-text explainers are labelled separately. Demo explanations are explicitly abstract-only.
-- Full-text HTML is bounded to the first 90,000 extracted characters. Figure choices use source captions, and the original image is shown unchanged.
+- Full-text HTML is bounded to the first 90,000 extracted characters. Feed figure choices use source captions plus actual low-detail image previews, and the selected original image is shown unchanged. Unreviewed older bookmarks use a simple concept illustration until refreshed.
 - Some papers have no usable figures or HTML. Their feed cards use Terra-authored conceptual SVG illustrations, not fabricated plots. Full-text failures still show an error and link to the original; they never silently masquerade as full-paper explanations.
 - AI can miss nuance. Preprints may not be peer reviewed. Check the original publication.
 - Public demo date filters are disabled because its sample collection is fixed.
 
 ## Design and attribution
 
-Interaction structure follows a social feed. UI references: [Luma style guide](https://luma.com/style-guide). A dark Luma-inspired background, separate rounded charcoal cards, sans-serif type, concise posts, and understated controls. Icons: [Reicon](https://reicon.dev/), MIT licensed. Papers, metadata and credited figures remain their authors' work; see each original publication for its licence. Demo source figures link directly to arXiv. Fallback illustration designs were prepared with Terra; their SVG renderer only accepts predefined layouts and escaped text. Run `node --import tsx scripts/refresh-demo-visuals.ts` locally to refresh the demo visual selection. This script is never invoked by the Pages workflow.
+Interaction structure follows a social feed. UI references: [Luma style guide](https://luma.com/style-guide). A dark Luma-inspired background with a narrow Twitter-style post stream, sans-serif type, concise text above one image, and understated controls. Icons: [Reicon](https://reicon.dev/), MIT licensed. Papers, metadata and credited figures remain their authors' work; see each original publication for its licence. Demo source figures link directly to arXiv. Fallback illustration designs were prepared with Terra; their SVG renderer only accepts predefined single-diagram layouts and escaped text. Run `node --import tsx scripts/refresh-demo-posts.ts` locally to refresh the concise demo text and vision-checked image selection. This script is never invoked by the Pages workflow.
