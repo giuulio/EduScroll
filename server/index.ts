@@ -8,6 +8,8 @@ import {z} from 'zod';
 import {timingSafeEqual} from 'node:crypto';
 import {searchPapers,getPaper,fullPaper,articleHtml,paperIdPattern,baseId} from './papers';
 import type {Paper,Detail} from '../src/types';
+import {illustrationFigure} from '../src/visuals';
+import {illustrationSchema} from './schemas';
 
 const app=express();const port=Number(process.env.PORT??3001);const host='127.0.0.1';
 const token=process.env.API_ACCESS_TOKEN??'';
@@ -28,7 +30,7 @@ app.use('/api',(req,res,next)=>{
 app.use('/api',rateLimit({windowMs:10*60*1000,limit:30,standardHeaders:'draft-7',legacyHeaders:false,message:{error:'You’ve reached the prototype’s request limit. Try again in a few minutes.'}}));
 const client=process.env.OPENAI_API_KEY?new OpenAI({apiKey:process.env.OPENAI_API_KEY,timeout:120000,maxRetries:1}):null;
 const model=process.env.OPENAI_MODEL??'gpt-6.1-terra';
-const card=z.object({id:z.string(),headline:z.string(),summary:z.string(),whyItMatters:z.string(),tags:z.array(z.string()),figureIndex:z.number().int().nullable(),figureCaption:z.string()});
+const card=z.object({id:z.string(),headline:z.string(),summary:z.string(),whyItMatters:z.string(),tags:z.array(z.string()),figureIndex:z.number().int().nullable(),figureCaption:z.string(),illustration:illustrationSchema});
 const cards=z.object({cards:z.array(card)});
 const expanded=z.object({paragraphs:z.array(z.string()),takeaway:z.string(),limitation:z.string(),sections:z.array(z.string()),figureIndex:z.number().int().nullable(),figureCaption:z.string()});
 const cache=new Map<string,{expires:number;value:any}>();const pending=new Map<string,Promise<any>>();const known=new Map<string,Paper>();let inFlight=0;
@@ -44,13 +46,13 @@ app.post('/api/feed',async(req,res,next)=>{try{
  const parsed=z.object({topic:z.string().trim().min(2).max(160),days:z.union([z.literal(1),z.literal(7),z.literal(30)]).default(7),cursor:z.number().int().min(0).max(1000).default(0),exclude:z.array(z.string().max(100)).max(1000).default([])}).parse(req.body);
  const ai=requireClient();const result=await cached(`feed:${parsed.topic.toLowerCase()}:${parsed.days}:${parsed.cursor}`,async()=>{
   const found=await searchPapers(parsed.topic,parsed.days,parsed.cursor);if(!found.papers.length)return {...found,mode:'live'};
-  // Enrich the first three cards with real figures; unavailable HTML never blocks the batch.
+  // Every paper gets a figure lookup and a Terra-authored illustration as its fallback.
   const visuals=new Map<string,Awaited<ReturnType<typeof articleHtml>>>();
-  for(const paper of found.papers.slice(0,3)){try{visuals.set(paper.id,await articleHtml(paper.id));}catch{}}
-  const response=await ai.responses.parse({model,reasoning:{effort:'low'},store:false,instructions:editorial+' Create one card for EACH supplied paper. Copy its ID exactly. Headline: 6–14 words. Summary: 35–60 words. whyItMatters: one sentence grounded in the abstract. tags: 1–3 short topic labels. figureIndex: select the most informative supplied figure caption index, or null if none is suitable. figureCaption: a 12–25-word plain-English explanation grounded in that caption, or an empty string if no figure. The abstracts and captions are the entire evidence base; do not imply you read the full paper or inspected an image.',input:JSON.stringify(found.papers.map(p=>({id:p.id,title:p.title,abstract:p.abstract,figures:visuals.get(p.id)?.figures.map((f,index)=>({index,caption:f.caption}))??[]}))),text:{format:zodTextFormat(cards,'research_cards')},max_output_tokens:9000});
+  for(const paper of found.papers){try{visuals.set(paper.id,await articleHtml(paper.id));}catch{}}
+  const response=await ai.responses.parse({model,reasoning:{effort:'low'},store:false,instructions:editorial+' Create one card for EACH supplied paper. Copy its ID exactly. Headline: 6–14 words. Summary: 35–60 words. whyItMatters: one sentence grounded in the abstract. tags: 1–3 short topic labels. figureIndex: select the most informative supplied figure caption index, or null if none is suitable. figureCaption: a 12–25-word plain-English explanation grounded in that caption, or an empty string if no figure. illustration: design a conceptual illustration for EACH card, even when it has a source figure. Choose layout pipeline, network, layers, comparison, or orbit. Supply exactly three short labels (up to 22 characters each) specific to the paper, a colour accent, and a one-sentence caption. Show the main idea, never invented measured results, numeric values, charts, or axes. This is the fallback image, not evidence. The abstracts and captions are the entire evidence base; do not imply you read the full paper or inspected an image.',input:JSON.stringify(found.papers.map(p=>({id:p.id,title:p.title,abstract:p.abstract,figures:visuals.get(p.id)?.figures.map((f,index)=>({index,caption:f.caption}))??[]}))),text:{format:zodTextFormat(cards,'research_cards')},max_output_tokens:9000});
   if(!response.output_parsed)throw new Error('The model could not prepare these cards. Please try again.');
   const generated=new Map(response.output_parsed.cards.map(p=>[p.id,p]));
-  const papers=found.papers.map(p=>{const c=generated.get(p.id);if(!c)throw new Error('Some cards were incomplete. Please try again.');const {figureIndex,figureCaption,...copy}=c;const original=figureIndex===null?undefined:visuals.get(p.id)?.figures[figureIndex];const figure=original?{...original,caption:figureCaption||original.caption}:undefined;const result={...p,...copy,...(figure?{figure}:{})};known.set(p.id,result);return result;});
+  const papers=found.papers.map(p=>{const c=generated.get(p.id);if(!c)throw new Error('Some cards were incomplete. Please try again.');const {figureIndex,figureCaption,...copy}=c;const original=figureIndex===null?undefined:visuals.get(p.id)?.figures[figureIndex];const figure=original?{...original,caption:figureCaption||original.caption,kind:'paper' as const}:illustrationFigure(c.illustration);const result={...p,...copy,figure};known.set(p.id,result);return result;});
   if(known.size>1000)known.delete(known.keys().next().value!);
   return {...found,papers,mode:'live'};
  });
@@ -65,7 +67,7 @@ app.post('/api/paper',async(req,res,next)=>{try{
   const input:any=source.pdf?[{role:'user',content:[{type:'input_file',filename:`${id.replace('/','-')}.pdf`,file_data:`data:application/pdf;base64,${source.pdf}`},{type:'input_text',text:evidence}]}]:evidence;
   const response=await ai.responses.parse({model,reasoning:{effort:'low'},store:false,instructions,input,text:{format:zodTextFormat(expanded,'paper_explainer')},max_output_tokens:3500});
   const data=response.output_parsed;if(!data)throw new Error('The model could not explain this paper. Please try again.');
-  const original=data.figureIndex!==null?source.figures[data.figureIndex]:undefined;const figure=original?{...original,caption:data.figureCaption||original.caption}:undefined;
+  const original=data.figureIndex!==null?source.figures[data.figureIndex]:undefined;const figure=original?{...original,caption:data.figureCaption||original.caption,kind:'paper' as const}:known.get(id)?.figure;
   return {paragraphs:data.paragraphs,takeaway:data.takeaway,limitation:data.limitation,sections:data.sections,basis:'full-text',...(figure?{figure}:{})};
  });res.json(result);
  }catch(e){next(e);}});

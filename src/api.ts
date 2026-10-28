@@ -1,6 +1,7 @@
 import type {Paper,FeedResult,Detail} from './types';
 import demoData from './demo.json';
-export const demoPapers=demoData as Paper[];
+import {ensureVisual} from './visuals';
+export const demoPapers=(demoData as Paper[]).map(ensureVisual);
 export function apiBase(){return '';}
 export async function request<T>(path:string,body?:unknown):Promise<T>{
  const token=sessionStorage.getItem('eduscroll-token');

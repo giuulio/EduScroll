@@ -39,8 +39,8 @@ Do not put the key in frontend code, a `VITE_` variable, GitHub Actions, or GitH
 
 1. A topic and date range become a constrained arXiv API query.
 2. The server retrieves up to ten recent papers, using their original submission dates rather than version-update dates.
-3. HTML figures and captions are retrieved for the first three papers where available.
-4. GPT-6.1 Terra turns abstracts and supplied captions into schema-validated cards. Cards use original metadata and source links.
+3. HTML figures and captions are retrieved for every paper where available.
+4. GPT-6.1 Terra turns abstracts and supplied captions into schema-validated cards, and designs a paper-specific SVG concept illustration as a fallback. Every card has a visual: an original figure where suitable, or an explicitly labelled AI illustration. The same fallback covers source images that fail to load.
 5. Opening a card fetches article text beyond the abstract. If HTML is unavailable, a PDF up to 12 MB is provided to the same model. The resulting explainer is cached.
 6. Another batch advances the source cursor and deduplicates paper versions. Fewer than ten cards are shown when fewer results exist; papers are never invented to fill a quota.
 
@@ -76,10 +76,10 @@ Pushes to `main` run `.github/workflows/pages.yml`: install, tests, production b
 - “Today” uses UTC calendar dates. Publication labels on arXiv mean preprint submission, not journal publication.
 - Abstract-based cards and full-text explainers are labelled separately. Demo explanations are explicitly abstract-only.
 - Full-text HTML is bounded to the first 90,000 extracted characters. Figure choices use source captions, and the original image is shown unchanged.
-- Some papers have no usable figures or HTML. Full-text failures show an error and link to the original; they never silently masquerade as full-paper explanations.
+- Some papers have no usable figures or HTML. Their feed cards use Terra-authored conceptual SVG illustrations, not fabricated plots. Full-text failures still show an error and link to the original; they never silently masquerade as full-paper explanations.
 - AI can miss nuance. Preprints may not be peer reviewed. Check the original publication.
 - Public demo date filters are disabled because its sample collection is fixed.
 
 ## Design and attribution
 
-Interaction structure follows a social feed. UI references: [Luma style guide](https://luma.com/style-guide). Sans-serif type, concise posts, understated controls. Icons: [Reicon](https://reicon.dev/), MIT licensed. Papers, metadata and credited figures remain their authors' work; see each original publication for its licence. The demo figure links directly to its arXiv source.
+Interaction structure follows a social feed. UI references: [Luma style guide](https://luma.com/style-guide). A dark Luma-inspired background, separate rounded charcoal cards, sans-serif type, concise posts, and understated controls. Icons: [Reicon](https://reicon.dev/), MIT licensed. Papers, metadata and credited figures remain their authors' work; see each original publication for its licence. Demo source figures link directly to arXiv. Fallback illustration designs were prepared with Terra; their SVG renderer only accepts predefined layouts and escaped text. Run `node --import tsx scripts/refresh-demo-visuals.ts` locally to refresh the demo visual selection. This script is never invoked by the Pages workflow.

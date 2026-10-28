@@ -18,9 +18,20 @@
       "Computer vision",
       "3D graphics"
     ],
+    "illustration": {
+      "layout": "layers",
+      "labels": [
+        "Hexagonal patches",
+        "Local color gradients",
+        "Scene surface"
+      ],
+      "accent": "orange",
+      "caption": "Conceptual view of how Hexels represent a scene surface."
+    },
     "figure": {
       "url": "https://arxiv.org/html/2610.37668v1/hexel_method_combined.png",
-      "caption": "Figure 1 from the paper. Flat hexagonal patches combine to represent a 3D surface; each patch can vary in colour across its area."
+      "caption": "Hexagonal surface patches combine adjustable boundaries with local color gradients to approximate coherent regions of a scene.",
+      "kind": "paper"
     }
   },
   {
@@ -45,7 +56,22 @@
     "tags": [
       "Robotics",
       "World models"
-    ]
+    ],
+    "illustration": {
+      "layout": "pipeline",
+      "labels": [
+        "Human and robot motion",
+        "Dynamics reasoning",
+        "Imagined future"
+      ],
+      "accent": "blue",
+      "caption": "Conceptual view of ThinkWorld's action reasoning process."
+    },
+    "figure": {
+      "url": "https://arxiv.org/html/2610.37666v1/thinkworld_main_arch_full_blue.png",
+      "caption": "ThinkWorld learns shared motion representations and reinforces action reasoning by comparing imagined futures with observed outcomes.",
+      "kind": "paper"
+    }
   },
   {
     "id": "2610.37656v1",
@@ -65,7 +91,17 @@
     "tags": [
       "AI",
       "Mathematics"
-    ]
+    ],
+    "illustration": {
+      "layout": "network",
+      "labels": [
+        "Entity relations",
+        "Closed relation loop",
+        "Edge update"
+      ],
+      "accent": "purple",
+      "caption": "Conceptual illustration of relations interacting through closed loops."
+    }
   },
   {
     "id": "2610.37655v1",
@@ -85,7 +121,22 @@
     "tags": [
       "Climate",
       "Scientific computing"
-    ]
+    ],
+    "illustration": {
+      "layout": "pipeline",
+      "labels": [
+        "KPP mechanism",
+        "Differentiable chemistry",
+        "Parameter estimation"
+      ],
+      "accent": "green",
+      "caption": "Conceptual view of KPPax converting chemical mechanisms into differentiable models."
+    },
+    "figure": {
+      "url": "https://arxiv.org/html/2610.37655v1/rate_eigvec_loadings.png",
+      "caption": "Fisher information analysis identifies constrained rate coefficients and compares predicted uncertainties with estimates from repeated trials.",
+      "kind": "paper"
+    }
   },
   {
     "id": "2610.37649v1",
@@ -106,7 +157,22 @@
     "tags": [
       "AI",
       "Scientific discovery"
-    ]
+    ],
+    "illustration": {
+      "layout": "orbit",
+      "labels": [
+        "Altered physics",
+        "Open exploration",
+        "Experimental reports"
+      ],
+      "accent": "orange",
+      "caption": "Conceptual illustration of exploring a simulated world with altered physics."
+    },
+    "figure": {
+      "url": "https://arxiv.org/html/2610.37649v1/longchang_world.png",
+      "caption": "In LongChang's glass room, explorers manipulate objects and build tools while other models evolve scenes.",
+      "kind": "paper"
+    }
   },
   {
     "id": "2610.37647v1",
@@ -126,7 +192,22 @@
     "tags": [
       "AI",
       "Model training"
-    ]
+    ],
+    "illustration": {
+      "layout": "pipeline",
+      "labels": [
+        "Muon update",
+        "Remove radial part",
+        "Relaxed norm growth"
+      ],
+      "accent": "purple",
+      "caption": "Conceptual view of the MuonGS update."
+    },
+    "figure": {
+      "url": "https://arxiv.org/html/2610.37647v1/ct_full_and_later_windows_v2.png",
+      "caption": "Effective learning rate accumulation is shown across training horizons and within successive intervals for a GPT-style model.",
+      "kind": "paper"
+    }
   },
   {
     "id": "2610.37631v1",
@@ -147,7 +228,22 @@
     "tags": [
       "AI",
       "Language models"
-    ]
+    ],
+    "illustration": {
+      "layout": "comparison",
+      "labels": [
+        "Stable knowledge",
+        "Variable knowledge",
+        "Pretraining progress"
+      ],
+      "accent": "blue",
+      "caption": "Conceptual comparison of knowledge categories tracked during pretraining."
+    },
+    "figure": {
+      "url": "https://arxiv.org/html/2610.37631v1/fig/paper-ready-main-plot.png",
+      "caption": "Across models and benchmarks, temporally variable items generally pull ahead of stable items later in pretraining.",
+      "kind": "paper"
+    }
   },
   {
     "id": "2610.37624v1",
@@ -168,7 +264,22 @@
     "tags": [
       "AI",
       "AI agents"
-    ]
+    ],
+    "illustration": {
+      "layout": "pipeline",
+      "labels": [
+        "Distributed facts",
+        "Compressed memory",
+        "Group decision"
+      ],
+      "accent": "pink",
+      "caption": "Conceptual view of memory compression in group decisions."
+    },
+    "figure": {
+      "url": "https://arxiv.org/html/2610.37624v1/figures/fig2.png",
+      "caption": "Agents discuss distributed facts before a memory policy compresses their discussion for a separate decision call.",
+      "kind": "paper"
+    }
   },
   {
     "id": "2610.37613v1",
@@ -192,7 +303,22 @@
     "tags": [
       "Computer vision",
       "Video"
-    ]
+    ],
+    "illustration": {
+      "layout": "pipeline",
+      "labels": [
+        "Video regions",
+        "Latent evidence",
+        "Reasoning and answer"
+      ],
+      "accent": "blue",
+      "caption": "Conceptual view of visual evidence supporting video reasoning."
+    },
+    "figure": {
+      "url": "https://arxiv.org/html/2610.37613v1/overview.png",
+      "caption": "VideoLVR trains on evidence-grounded reasoning and generates latent visual states alongside text during inference.",
+      "kind": "paper"
+    }
   },
   {
     "id": "2610.37605v1",
@@ -213,7 +339,17 @@
     "tags": [
       "Audio",
       "AI evaluation"
-    ]
+    ],
+    "illustration": {
+      "layout": "comparison",
+      "labels": [
+        "Original sound",
+        "Same-class edit",
+        "Different-class edit"
+      ],
+      "accent": "green",
+      "caption": "Conceptual comparison of matched local sound edits."
+    }
   },
   {
     "id": "2610.37599v1",
@@ -238,7 +374,22 @@
     "tags": [
       "On-device AI",
       "Image editing"
-    ]
+    ],
+    "illustration": {
+      "layout": "layers",
+      "labels": [
+        "Mobile tasks",
+        "Editing capabilities",
+        "Deployment needs"
+      ],
+      "accent": "orange",
+      "caption": "Conceptual view of the benchmark's mobile evaluation framework."
+    },
+    "figure": {
+      "url": "https://arxiv.org/html/2610.37599v1/intro.png",
+      "caption": "MoI-Bench connects mobile user needs to structured capability evaluation and a quality-deployability map for model improvement.",
+      "kind": "paper"
+    }
   },
   {
     "id": "2610.37598v1",
@@ -261,7 +412,22 @@
     "tags": [
       "Traffic",
       "Forecasting"
-    ]
+    ],
+    "illustration": {
+      "layout": "network",
+      "labels": [
+        "Road topology",
+        "Sensor histories",
+        "Traffic forecast"
+      ],
+      "accent": "blue",
+      "caption": "Conceptual view of graph-aware traffic forecasting."
+    },
+    "figure": {
+      "url": "https://arxiv.org/html/2610.37598v1/GAS-pipeline_tryagain.drawio.png",
+      "caption": "GAS-PFN combines graph-structured prior tasks, context tokens, dual inference branches, and output fusion for forecasting.",
+      "kind": "paper"
+    }
   },
   {
     "id": "2610.37588v1",
@@ -280,7 +446,22 @@
     "tags": [
       "AI",
       "World models"
-    ]
+    ],
+    "illustration": {
+      "layout": "comparison",
+      "labels": [
+        "Real transitions",
+        "Latent predictions",
+        "Rollout consistency"
+      ],
+      "accent": "purple",
+      "caption": "Conceptual comparison of environmental transitions and latent predictions."
+    },
+    "figure": {
+      "url": "https://arxiv.org/html/2610.37588v1/iclr-figures/Figure1.png",
+      "caption": "Faithful latent dynamics are evaluated by comparing predicted latent rollouts with representations of realized observations.",
+      "kind": "paper"
+    }
   },
   {
     "id": "2610.37585v1",
@@ -653,7 +834,17 @@
     "tags": [
       "Forecasting",
       "Open models"
-    ]
+    ],
+    "illustration": {
+      "layout": "pipeline",
+      "labels": [
+        "Observed context",
+        "Future covariates",
+        "Forecast distribution"
+      ],
+      "accent": "green",
+      "caption": "Conceptual view of Timestral's probabilistic forecasting inputs and output."
+    }
   },
   {
     "id": "2610.37584v1",
@@ -678,7 +869,22 @@
     "tags": [
       "Recommendations",
       "AI"
-    ]
+    ],
+    "illustration": {
+      "layout": "network",
+      "labels": [
+        "Item similarity",
+        "History transitions",
+        "Semantic IDs"
+      ],
+      "accent": "pink",
+      "caption": "Conceptual view of item relations used in generative recommendation."
+    },
+    "figure": {
+      "url": "https://arxiv.org/html/2610.37584v1/Intro_final.png",
+      "caption": "The figure illustrates semantic similarity, item transitions, and preference-based ranking relations in generative recommendation.",
+      "kind": "paper"
+    }
   },
   {
     "id": "2610.37571v1",
@@ -702,7 +908,22 @@
     "tags": [
       "AI agents",
       "Collaboration"
-    ]
+    ],
+    "illustration": {
+      "layout": "network",
+      "labels": [
+        "Distributed evidence",
+        "Agent communication",
+        "Team decision"
+      ],
+      "accent": "blue",
+      "caption": "Conceptual view of a team integrating distributed information."
+    },
+    "figure": {
+      "url": "https://arxiv.org/html/2610.37571v1/three_mode_comparison_final_public.png",
+      "caption": "Three evaluation conditions distinguish communication and retrieval gaps when pivotal information is distributed among agents.",
+      "kind": "paper"
+    }
   },
   {
     "id": "2610.37567v1",
@@ -721,7 +942,22 @@
     "tags": [
       "AI agents",
       "Real-time systems"
-    ]
+    ],
+    "illustration": {
+      "layout": "orbit",
+      "labels": [
+        "Changing game state",
+        "Agent observation",
+        "Real-time action"
+      ],
+      "accent": "orange",
+      "caption": "Conceptual view of an agent interacting with an evolving minigame."
+    },
+    "figure": {
+      "url": "https://arxiv.org/html/2610.37567v1/teaser_four_examples_ghost_20260926.png",
+      "caption": "Generated real-time minigames cover different combinations of capabilities with controlled variations in difficulty and interaction.",
+      "kind": "paper"
+    }
   },
   {
     "id": "2610.37561v1",
@@ -745,7 +981,22 @@
     "tags": [
       "AI evaluation",
       "Health research"
-    ]
+    ],
+    "illustration": {
+      "layout": "comparison",
+      "labels": [
+        "Global uncertainty",
+        "Class-aware review",
+        "Clinical decisions"
+      ],
+      "accent": "green",
+      "caption": "Conceptual comparison of approaches to uncertainty under class imbalance."
+    },
+    "figure": {
+      "url": "https://arxiv.org/html/2610.37561v1/fig2_failure_map_n1000.png",
+      "caption": "Heatmaps compare minority sensitivity under standard uncertainty and a proposed correction across synthetic class-imbalance conditions.",
+      "kind": "paper"
+    }
   },
   {
     "id": "2610.37550v1",
@@ -765,7 +1016,22 @@
     "tags": [
       "Robotics",
       "Evaluation"
-    ]
+    ],
+    "illustration": {
+      "layout": "comparison",
+      "labels": [
+        "Joint direction",
+        "Commanded motion",
+        "Off-axis motion"
+      ],
+      "accent": "orange",
+      "caption": "Conceptual view of motion evaluated against an object's joint."
+    },
+    "figure": {
+      "url": "https://arxiv.org/html/2610.37550v1/figure-CRS-v2.png",
+      "caption": "A drawer-trained policy and a door-trained policy both open a drawer, prompting examination of their commanded motions.",
+      "kind": "paper"
+    }
   },
   {
     "id": "2610.37547v1",
@@ -786,6 +1052,21 @@
     "tags": [
       "Robotics",
       "Human feedback"
-    ]
+    ],
+    "illustration": {
+      "layout": "pipeline",
+      "labels": [
+        "Human corrections",
+        "Correction gate",
+        "Residual robot action"
+      ],
+      "accent": "purple",
+      "caption": "Conceptual view of human-guided residual correction for a robot policy."
+    },
+    "figure": {
+      "url": "https://arxiv.org/html/2610.37547v1/fig1_arc_overall_A.png",
+      "caption": "Human corrections define when and where residual exploration occurs, while task reward trains the corrective actor.",
+      "kind": "paper"
+    }
   }
 ]
