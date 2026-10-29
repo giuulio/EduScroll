@@ -1,85 +1,71 @@
 # EduScroll
 
-Fresh research, a little easier to scroll.
+**[Open EduScroll](https://giuulio.github.io/EduScroll/)** · [Research API](https://eduscroll-research-api.sageorbit65.chatgpt.site/) · React + TypeScript
 
-**[Public demo](https://giuulio.github.io/EduScroll/)** · React + TypeScript · GPT-6.1 Terra · arXiv
+Search a research topic, scroll through short evidence-backed posts, and open the original publication or an explanation. Bookmark papers in your browser and share their source links.
 
-Choose a topic, scroll through ten short research posts, and open a paper for a deeper explanation. Each post uses one or two simple sentences (at most 280 characters), followed by one full-width image. Bookmark discoveries, share original publications, and request another batch without repeats.
+## Public demo and live research
 
-The public GitHub Pages site serves a clearly labelled, curated demo collection of 20 real arXiv papers from 27 October 2026. **It cannot call your local inference server or spend your OpenAI credits.** Live generation runs only on your computer.
+The public site works without a download:
+
+- **Browse the demo:** 20 real arXiv papers from 27 October 2026, with manually reviewed posts, supporting quotations, original figures and varied conceptual illustrations. Date filters use the papers' actual dates. Empty periods show an explicit wider-date notice.
+- **Use your OpenAI key:** connect a project key in the site to search arXiv, Europe PMC and OpenAlex and generate live posts. GPT-6.1 Terra is the default. GPT-6 Luna is an explicit lower-cost experimental option; no automatic model switch occurs.
+
+Visitor keys are kept in tab memory, sent over HTTPS to the hosted EduScroll API and then OpenAI, and never saved to browser storage or the API's caches or logs. Disconnect or reload to clear the key. You must trust the hosted service to handle the key temporarily. Generation is charged to your OpenAI account; a key is checked for model access before connection. The public service has no owner inference key and cannot spend the repository owner's credits.
+
+The [commit plan](COMMIT_PLAN.md) records the implementation sequence and acceptance checks. Editorial contracts live in [content/](content/).
+
+## Discovery and content
+
+- Free-form searches retain subject concepts and group synonyms; fuzzy matching handles common spelling errors. The source APIs supply real metadata and abstracts, never invented papers.
+- Today, this week (Monday onward), and this month use UTC calendar dates. Publication dates are original source dates, not retrieval or revision times.
+- If a selected period has no matches, the feed explicitly labels related papers from all dates. A source outage produces partial results and a notice.
+- Best match combines relevance, modest freshness and source diversity. Latest sorts by publication date. DOI, title and arXiv-version deduplication prevents repeat works.
+- Feed text uses abstracts, exact supporting passages and conservative numerical checks. Posts appear in small batches without waiting for article pages or image inspection. Unverifiable generated claims fall back to a labelled source excerpt. Papers without a usable abstract are skipped.
+- Concept illustrations depict a subject, not measured results. Readable original images stay attributed to their paper. Some posts are text-only.
+- Opening a paper retrieves arXiv full text or a bounded PDF on demand. Other sources currently use their abstract. The explanation always labels its evidence basis; unavailable full text never masquerades as a full-paper reading.
+
+Preprints and research articles are labelled by their source. An AI explanation can miss nuance: consult the original publication.
 
 ## Run locally
 
 Requires Node.js 22 or newer.
 
 ```sh
-cd ~/Developer/EduScroll
 npm ci
-cp -n .env.example .env
-```
-
-Edit `.env` and add your EduScroll project's OpenAI key:
-
-```dotenv
-OPENAI_API_KEY=your-project-key-here
-OPENAI_MODEL=gpt-6.1-terra
-```
-
-Then:
-
-```sh
 npm run dev
 ```
 
-Open **http://127.0.0.1:5173**. The UI detects whether the local API has a key. Once configured, searching a topic generates live cards. Restart the dev command after changing `.env`.
+Open http://127.0.0.1:5173. You can enter a key through the UI. Alternatively configure `OPENAI_API_KEY` and optional `OPENAI_MODEL` in your local server environment and restart the API. Local configuration may use an ignored `.env` file. Never put a key in a `VITE_` variable, tracked source, workflow, URL, or chat.
 
-Do not put the key in frontend code, a `VITE_` variable, GitHub Actions, or GitHub Pages. `.env` and all `.env.*` files except the empty example are ignored by Git. Do not paste a key into the app or a chat.
-
-## Information flow
-
-1. A topic and date range become a constrained arXiv API query.
-2. The server retrieves up to ten recent papers, using their original submission dates rather than version-update dates.
-3. HTML figures and captions are retrieved for every paper where available.
-4. Candidate images first pass a conservative caption check, then Terra inspects bounded image previews. Only a single, readable photo, plot or diagram may be selected. Dense architectures, multi-panel figures, tables and collages are rejected. Terra also writes the short post and designs a simple concept illustration as its labelled fallback.
-5. Opening a card fetches article text beyond the abstract. If HTML is unavailable, a PDF up to 12 MB is provided to the same model. The resulting explainer is cached.
-6. Another batch advances the source cursor and deduplicates paper versions. Fewer than ten cards are shown when fewer results exist; papers are never invented to fill a quota.
-
-## Private by default
-
-- The API binds to **127.0.0.1**, not the LAN or public internet.
-- Requests from non-local browser origins and unexpected hostnames are rejected before any inference.
-- The public production build always uses demo data. It has no backend URL or OpenAI key.
-- OpenAI is called server-side with `store: false`.
-- Rate limits, three-request concurrency limits, six-hour in-memory caches, and arXiv request spacing constrain prototype usage.
-- Bookmarks stay in browser local storage. There are no accounts, analytics, or database.
-- Optional `API_ACCESS_TOKEN` can add another local gate. If set, provide it in this browser's session storage as `eduscroll-token`; this is **not** the OpenAI key.
-
-This is a local prototype, not a hardened multi-user inference service. Do not tunnel or expose the server publicly.
+The local API binds only to 127.0.0.1 and rejects public hosts/origins. Optional `API_ACCESS_TOKEN` is entered in local connection settings and sent as `X-EduScroll-Access-Token`; it also stays in memory. The public Worker uses a separate hosted mode that requires a visitor key on every inference request.
 
 ## Commands
 
 | Command | Purpose |
 |---|---|
-| `npm run dev` | Local React frontend + private API |
-| `npm run dev:ui` | Frontend only; demo mode when API is absent |
-| `npm start` | API only |
-| `npm test` | Source parsing, date handling, figure extraction, local-only access checks |
-| `npm run build` | Type-check and build the static frontend |
+| `npm run dev` | Frontend and loopback-only API |
+| `npm run dev:ui` | Frontend preview |
+| `npm start` | Loopback-only API |
+| `npm test` | Offline parsing, discovery, evidence, streaming and security tests |
+| `npm run build` | Type-check and build the GitHub Pages frontend |
+| `npm run build:api` | Bundle and validate the hosted Worker; replaces `dist/` |
+| `npm run benchmark:models -- --help` | Show opt-in benchmark usage without model requests |
 
-## GitHub Pages
+`benchmark:models` requires explicit `--run` and reads a key only from the process environment. The default is Terra; comparing Luna requires `--models=gpt-6.1-terra,gpt-6-luna`. It records latency, tokens, estimated cost and manual quality fields. Benchmark reports default to the system temporary directory. Pricing is dated, and measured quality requires human review.
 
-Pushes to `main` run `.github/workflows/pages.yml`: install, tests, production build, deploy. Repository Settings → Pages uses **GitHub Actions**. The site is served at `/EduScroll/`; relative asset paths support that project path. No API key or secret is needed for deployment.
+Manual demo refresh scripts are local tools and never run in public deployment workflows.
 
-## Scope and limitations
+## Hosting and privacy boundaries
 
-- Initial live source: arXiv. Google Scholar has no bulk-access API and is not scraped.
-- “Today” uses UTC calendar dates. Publication labels on arXiv mean preprint submission, not journal publication.
-- Abstract-based cards and full-text explainers are labelled separately. Demo explanations are explicitly abstract-only.
-- Full-text HTML is bounded to the first 90,000 extracted characters. Feed figure choices use source captions plus actual low-detail image previews, and the selected original image is shown unchanged. Unreviewed older bookmarks use a simple concept illustration until refreshed.
-- Some papers have no usable figures or HTML. Their feed cards use Terra-authored conceptual SVG illustrations, not fabricated plots. Full-text failures still show an error and link to the original; they never silently masquerade as full-paper explanations.
-- AI can miss nuance. Preprints may not be peer reviewed. Check the original publication.
-- Public demo date filters are disabled because its sample collection is fixed.
+Pushes to `main` run tests and build/deploy the static frontend through `.github/workflows/pages.yml`. The only frontend service configuration is a public HTTPS address in `src/hosting.ts`.
+
+The Sites-hosted API is a standard Web Request/Response Worker from `worker/index.ts`, using the same service code as the local adapter. `.openai/hosting.json` identifies that service. Build and package the API after building the frontend; its deployment artifact is `dist/server/index.js`. No inference secret is configured on the public service.
+
+The API accepts only bounded research, explanation and connection operations, restricted models, JSON bodies and approved browser origins. It enforces per-key/per-IP limits, request deadlines and cancellation, and redacts provider error details. Caches hold only public paper metadata/content and model/protocol versions; keys and personalised instructions are excluded. Caches and counters are bounded, temporary and isolate-local, so warm-cache performance is not guaranteed across Worker instances. Pagination recovers from expired or relocated snapshots using excluded paper IDs.
+
+There are no accounts, analytics or private document uploads. Bookmarks alone use local storage. Source/API providers and the hosting platform process requests under their own policies. The service is a small prototype, not a key vault.
 
 ## Design and attribution
 
-Interaction structure follows a social feed. UI references: [Luma style guide](https://luma.com/style-guide). A dark Luma-inspired background with a narrow Twitter-style post stream, sans-serif type, concise text above one image, and understated controls. Icons: [Reicon](https://reicon.dev/), MIT licensed. Papers, metadata and credited figures remain their authors' work; see each original publication for its licence. Demo source figures link directly to arXiv. Fallback illustration designs were prepared with Terra; their SVG renderer only accepts predefined single-diagram layouts and escaped text. Run `node --import tsx scripts/refresh-demo-posts.ts` locally to refresh the concise demo text and vision-checked image selection. This script is never invoked by the Pages workflow.
+UI references: [Luma](https://luma.com/style-guide). Icons: [Reicon](https://reicon.dev/), MIT licensed. The interface uses system sans-serif type, capsule controls and a narrow social feed. Papers and credited source figures remain their authors' work; consult original publications for licences. Conceptual SVG illustrations use bounded layouts and escaped labels, without fabricated data plots.

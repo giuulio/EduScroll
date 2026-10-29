@@ -61,6 +61,6 @@ export async function getFeed(options:FeedOptions):Promise<FeedResult>{
 }
 export async function getDetail(paper:Paper,mode:'live'|'demo',signal?:AbortSignal):Promise<Detail>{
  if(mode==='live')return request('/api/paper',{id:paper.id,model:selectedModel},signal);
- return {paragraphs:[paper.summary,paper.whyItMatters],takeaway:paper.whyItMatters,limitation:'This explanation uses the abstract. Check the original publication for the complete methods and results.',basis:'demo',sections:['Abstract'],figure:paper.figure};
+ return {paragraphs:[paper.summary],takeaway:paper.whyItMatters,limitation:'This explanation uses the abstract. Check the original publication for the complete methods and results.',basis:'demo',sections:['Abstract'],figure:paper.figure};
 }
 export const currentDateBounds=dateBounds;

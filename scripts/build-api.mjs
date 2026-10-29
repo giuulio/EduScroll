@@ -1,0 +1,15 @@
+import {build} from 'esbuild';
+import {mkdir,copyFile,rm,readFile} from 'node:fs/promises';
+const output='dist';
+await rm(output,{recursive:true,force:true});
+await mkdir(`${output}/server`,{recursive:true});
+await mkdir(`${output}/.openai`,{recursive:true});
+await build({entryPoints:['worker/index.ts'],outfile:`${output}/server/index.js`,bundle:true,format:'esm',platform:'browser',target:'es2022',minify:true,legalComments:'none'});
+await copyFile('.openai/hosting.json',`${output}/.openai/hosting.json`);
+const source=await readFile(`${output}/server/index.js`,'utf8');
+if(/\bfrom\s*["']node:|\brequire\s*\(/.test(source))throw new Error('API artifact must not require Node modules at runtime.');
+const module=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
+if(typeof module.default?.fetch!=='function')throw new Error('API artifact must export fetch.');
+const response=await module.default.fetch(new Request('https://eduscroll.invalid/api/health'));
+if(!response.ok||(await response.json()).configured!==false)throw new Error('Hosted API must start without an owner key.');
+console.log(`Hosted API built and checked (${Math.round(source.length/1024)} KiB).`);

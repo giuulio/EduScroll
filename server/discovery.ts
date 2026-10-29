@@ -20,7 +20,7 @@ function doiFor(value:unknown):string|undefined{
  return /^10\.\d{4,9}\/\S+$/i.test(doi)?doi:undefined;
 }
 function blankPost(){return {headline:'',summary:'',whyItMatters:'',tags:[] as string[]};}
-function remember(papers:Paper[]){for(const paper of papers){known.set(paper.id,{paper,expires:Date.now()+snapshotLifetime});if(known.size>1500)known.delete(known.keys().next().value!);}}
+function remember(papers:Paper[]){for(const paper of papers){known.set(paper.id,{paper,expires:Date.now()+snapshotLifetime});if(known.size>600)known.delete(known.keys().next().value!);}}
 function boundedSignal(signal?:AbortSignal){return signal?AbortSignal.any([signal,AbortSignal.timeout(7000)]):AbortSignal.timeout(7000);}
 async function sourceJson(url:URL,signal?:AbortSignal):Promise<any>{
  const response=await fetch(url,{headers:{Accept:'application/json','User-Agent':'EduScroll/0.2 (research discovery prototype)'},signal:boundedSignal(signal)});
@@ -128,7 +128,7 @@ export async function discover(request:DiscoveryRequest):Promise<FeedResult>{
  }
  papers=rankPapers(papers,topic,request.sort);remember(papers);
  const snapshot:Snapshot={id:crypto.randomUUID(),topic:normalizedText(topic),range:request.range,sort:request.sort,papers,expires:Date.now()+snapshotLifetime,day,effectiveRange,message,sourceWarnings:[...new Set(sourceWarnings)]};
- if(snapshots.size>=80)snapshots.delete(snapshots.keys().next().value!);snapshots.set(snapshot.id,snapshot);
+ if(snapshots.size>=24)snapshots.delete(snapshots.keys().next().value!);snapshots.set(snapshot.id,snapshot);
  return recoveredPage(snapshot,request,recovered);
 }
 
