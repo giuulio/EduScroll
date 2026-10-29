@@ -1,25 +1,26 @@
-# Editorial protocol · v1
+# Editorial protocol · author voice
 
-Write like someone sharing a specific finding they want a friend to see. The feed post stands alone in 1–2 sentences, normally 20–40 words and no more than 280 characters.
+The feed is a labelled AI rewrite in the research team's point of view. Write a tweet the team could use to explain its supported finding: direct, specific and concise. It is not a post published by an author, and must not suggest that EduScroll performed the research.
 
-Choose a hook from the evidence:
+Use first-person plural when it clarifies the work: “We tested…”, “We built…”, “We found…”, “Our device…”. A result can lead without a pronoun when that sounds more natural. Vary the opening; do not make every card begin “We”. The post stands alone in 1–2 sentences, normally 20–40 words and no more than 280 characters.
 
-- Result: “Success rose from 33% to 75% across three real-robot tasks.”
-- Scale: “1,150 examples. 64 editing tasks. A phone-image benchmark goes beyond one overall score.”
-- Failure: “A robot can open a drawer and still make the wrong movement.”
-- Mechanism: “Human videos teach a robot which movements connect the scene now to what happens next.”
-- Contrast: describe a supported comparison in ordinary language, including the relevant baseline.
+Match the voice to the evidence:
 
-These are patterns, not fixed templates. Vary the opening across a feed. A question must lead to a specific answer supported by the source. Do not add an obligatory punchline, speculative application, or “why it matters” slogan.
+- Original research: “We cut reconstruction error by 28.9% across 15 test scans, using the same memory as the comparison method.”
+- Review: “We reviewed conductive materials for heart rhythm. Promising lab results still face a gap in larger-animal safety tests.” Use this only when the source supports that synthesis; do not imply the reviewers conducted the experiments.
+- Proposal: “We propose…” preserves that the device or mechanism is not yet a demonstrated result.
+- Mechanism or theoretical result: lead with the concrete relationship or counterexample, without forcing personal language.
 
-Use everyday words. Explain unfamiliar measures, or choose a more understandable detail. Preserve the condition that makes a claim true. In medical stories, distinguish synthetic data, patient cohorts, and clinical trials. Do not imply patient benefit or deployment readiness from a model benchmark.
+Never use reportorial wrappers such as “The article describes”, “This paper discusses”, “The study found”, or “According to this review”. Do not fill a post with “the abstract does not report a result”. Select a different supported fact. No obligatory punchline, speculative application, or “why it matters” slogan.
 
-Example from the bundled surface-reconstruction abstract:
+Use everyday words. Explain unfamiliar measures, or choose a more understandable detail. Preserve units, the comparison and the condition that makes a claim true. Keep simulation, lab, animal, patient-cohort and clinical-trial findings distinct. A device tested in pigs must not sound ready for human implantation.
 
-> Rebuilding 3D surfaces with hexagon-shaped pieces cut error by about 29% across 15 test scans. The comparison method used the same amount of memory.
+Select exact supporting quotations before writing. The live numerical guard requires exact numerical values from those quotations; dimension terms such as “3D” are descriptions, not new measured results. A manually reviewed demo may use sensible rounding with “about”, but the live path should retain the source's numerals. Never turn percent into percentage points, a benchmark metric into a success rate, or a relative improvement into an absolute one.
 
-The original says 28.9% lower reconstruction error on 15 scans against a memory-matched baseline. Do not replace that with “29% faster,” “29% better images,” or a claim about real-world deployment.
+No markdown, hashtags, emojis, title repetition, hype, or filler such as “a breakthrough”, “the future of”, “a little curiosity”, and “your next rabbit hole”. Headline: 5–9 simple words for the expanded view. Tags: 1–2 plain topics. The internal `whyItMatters` field is one grounded sentence, not extra feed copy.
 
-No markdown, hashtags, emojis, title repetition, hype, or filler such as “a breakthrough,” “the future of,” “a little curiosity,” and “your next rabbit hole.” Headline: 5–9 simple words for the expanded view. Tags: 1–2 plain topics. The internal `whyItMatters` field is one grounded sentence, not extra feed copy.
+Figures are selected independently of text. The text task may supply a meaningful subject illustration as an immediate fallback, but its visual preference must not suppress a verified source figure arriving later. Use text-only only when no meaningful visual is supported.
 
-Review a mixed sample for claim accuracy, useful specificity, readability, hook variety, and a preserved comparison/setting. The model benchmark includes fields for this human review; length and exact quotes alone are insufficient.
+If validation fails, publish a clearly labelled source excerpt without inventing a first-person rewrite. Prefer a direct result sentence over a reportorial introduction when both are available. Do not silently label an unchanged excerpt as an author-voice rewrite.
+
+Review a mixed sample for claim accuracy, useful specificity, readability, hook variety, and a preserved comparison/setting. Length and exact quotes alone are insufficient. `editorialVersion` in `server/editorial.ts` invalidates cached posts when these rules change.

@@ -30,3 +30,40 @@ test('fast generation uses abstract-only context, low output bounds, no stored r
  const ai={responses:{parse:async(options:any,requestOptions:any)=>{assert.equal(options.reasoning.effort,'none');assert.equal(options.store,false);assert.ok(options.max_output_tokens<3000);assert.ok(typeof options.input==='string');assert.ok(!options.input.includes('rankingReason'));receivedSignal=requestOptions.signal;return {output_parsed:{cards:[card]}};}}} as unknown as OpenAI;
  const [post]=await generateTextPosts(ai,'gpt-6.1-terra',[{...paper,rankingReason:'Matches a private search'}],cancellation.signal);assert.equal(post.contentBasis,'abstract');assert.equal(receivedSignal,cancellation.signal);
 });
+
+test('author-voice posts keep their experimental setting and comparison',()=>{
+ const summary='We cut reconstruction error by 29.3% across 15 test scans, using the same memory as the comparison method.';
+ assert.equal(validateGroundedPost({...card,summary},paper).summary,summary);
+});
+
+test('reportorial wrappers and abstract-availability filler do not enter rewritten posts',()=>{
+ for(const summary of ['The article describes a new reconstruction method.','This paper discusses surface reconstruction.','The study found better reconstruction.','According to this review, reconstruction improved.','The abstract does not report a specific result.']){
+  assert.throws(()=>validateGroundedPost({...card,summary},paper),/author-voice/);
+ }
+});
+
+test('review tweets cannot adopt experiments performed by the reviewed studies',()=>{
+ const source='We reviewed implanted pacemaker research. Earlier studies tested the devices in pigs.';
+ const review={...paper,abstract:source,publicationType:'review-article · Review'};
+ const base={...card,evidence:[source],headline:'A review of implanted pacemaker research',whyItMatters:''};
+ assert.equal(validateGroundedPost({...base,summary:'We reviewed implanted pacemaker research, including earlier tests in pigs.'},review).summary,'We reviewed implanted pacemaker research, including earlier tests in pigs.');
+ assert.throws(()=>validateGroundedPost({...base,summary:'We tested implanted pacemakers in pigs.'},review),/review cannot claim/);
+ const mixedSource='We reviewed prior research and we tested the devices in pigs.';
+ assert.equal(validateGroundedPost({...base,evidence:[mixedSource],summary:'We tested the devices in pigs.'},{...review,abstract:mixedSource}).summary,'We tested the devices in pigs.');
+});
+
+test('dimension labels are not treated as invented numerical measurements',()=>{
+ const source='In 15 test scans, the system reduced reconstruction error by 29.3% against the comparison method with the same memory budget.';
+ const geometry={...paper,title:'3D surface reconstruction',abstract:'We reconstructed 3D surfaces. '+source};
+ const parsed=validateGroundedPost({...card,headline:'3D surface pieces reduce errors in scans',evidence:[source]},geometry);
+ assert.match(parsed.headline,/3D/);
+ assert.throws(()=>validateGroundedPost({...card,summary:'We cut error by about 29% across 15 scans.'},paper),/numerical claim/);
+});
+
+test('source excerpt fallback prefers a direct finding over a reportorial sentence',()=>{
+ const source='The article describes a surface reconstruction method. Error fell by 29.3% across 15 test scans.';
+ const post=sourceExcerptPost({...paper,abstract:source});
+ assert.equal(post.summary,'Error fell by 29.3% across 15 test scans.');
+ assert.equal(post.contentBasis,'source-excerpt');
+ assert.deepEqual(post.evidence,['Error fell by 29.3% across 15 test scans.']);
+});
