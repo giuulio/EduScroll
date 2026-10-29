@@ -41,7 +41,7 @@ export function parseEuropePmc(data:any):Paper[]{
   const title=sourceText(entry.title);if(!epmcPattern.test(id)||!title)return [];
   const doi=doiFor(entry.doi);
   const authors=Array.isArray(entry.authorList?.author)?entry.authorList.author.map((author:any)=>sourceText(author.fullName??`${author.firstName??''} ${author.lastName??''}`)).filter(Boolean).slice(0,12):clean(entry.authorString).split(/,\s*/).filter(Boolean).slice(0,12);
-  return [{id,title,authors,published:clean(entry.firstPublicationDate??entry.pubYear),category:'Biomedicine',abstract:sourceText(entry.abstractText).slice(0,18000),url:`https://europepmc.org/article/${source}/${encodeURIComponent(externalId)}`,source:'europepmc' as const,publicationType:Array.isArray(entry.pubTypeList?.pubType)?entry.pubTypeList.pubType.map(sourceText).join(' · '):source==='PPR'?'Preprint':'Research article',...(doi?{doi}:{}),...blankPost()}];
+  return [{id,title,authors,published:clean(entry.firstPublicationDate??entry.pubYear),category:'Biomedicine',abstract:sourceText(entry.abstractText).slice(0,18000),url:`https://europepmc.org/article/${source}/${encodeURIComponent(externalId)}`,source:'europepmc' as const,publicationType:Array.isArray(entry.pubTypeList?.pubType)?entry.pubTypeList.pubType.map(sourceText).join(' · '):source==='PPR'?'Preprint':'Research article',...(doi?{doi}:{}),...(/^PMC\d+$/.test(clean(entry.pmcid))?{pmcid:clean(entry.pmcid)}:{}),...blankPost()}];
  });
 }
 async function europePmc(topic:string,range:DateRange,sort:SortOrder,signal?:AbortSignal):Promise<Paper[]>{

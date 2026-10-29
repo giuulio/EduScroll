@@ -11,3 +11,11 @@ Concept art must be labelled as an illustration. Its geometry does not encode me
 Review the feed as a sequence. Avoid adjacent repeated compositions and repeated three-step diagrams. Change the visual idea before changing only its accent. If a source image fails, use its safe conceptual fallback unless the card explicitly requests no visual.
 
 The bundled demo is manually curated from its stored abstracts. Refresh scripts can generate draft copy and inspect source images, but an update still needs evidence and feed-level visual review. Keep live rendering local and immediate; image generation is not a prerequisite for reading a post.
+
+## Independent source-figure worker
+
+- Retrieve arXiv figures or original PMC Open Data media and JATS captions. Resolve biomedical records by PMCID, PMID or an exact DOI match. Never guess a publisher asset URL.
+- Select from actual high-detail previews. Prefer a readable whole image; otherwise identify one self-contained panel with normalized crop coordinates.
+- Preserve axes, tick labels, units, legends, scale bars and relevant controls. An independent second inspection must confirm crop readability at phone width. Reject an ambiguous or misleading crop.
+- Keep original bytes and caption. Apply a reversible display viewport, with Full figure and Source controls, attribution and licence. Do not crop no-derivatives material.
+- Run concurrently with post writing. A source figure overrides a text-only conceptual-art preference. A missing image or failed selection never delays readable text or fails a feed.

@@ -25,3 +25,11 @@ Each functional commit must pass `npm test` and `npm run build`, then be pushed 
 - Text arrives before optional figures; cancelled searches do not update the UI or continue avoidable provider work.
 - Every numerical demo claim is supported by its supplied abstract. No fabricated chart values or unlabelled conceptual art.
 - Targets to measure: cached feed under one second; first cold live card in 5–10 seconds under normal provider conditions. Report actual verification limits.
+
+## Follow-up: parallel figures and author voice (29 October 2026)
+
+- Write original research posts from the team’s perspective, with an AI-rewrite label and separate review/proposal safeguards. Bump editorial versions so generic cached copy is replaced.
+- Retrieve original arXiv/PMC images independently of text. Inspect real previews, verify panel crops in a second pass, retain captions/licences, and let readers restore the full figure.
+- Stream a cited briefing immediately after retrieval, run two text workers and two figure workers concurrently, preserve rank order, and merge late media into cards, bookmarks and open explanations.
+- Verification: 76 offline tests, frontend build and Worker artifact validation pass. Desktop/phone checks verified reversible crops and original-image rendering.
+- One approved local live feed for “nanotech for pacemakers”: briefing 0.84s, first source figure 8.50s, first post 11.32s, complete 19.21s. Eight of nine posts had visuals: four original figures (one verified crop) and four concept illustrations. These are measurements from one local run, not hosted latency guarantees.

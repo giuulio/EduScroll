@@ -1,11 +1,13 @@
 import OpenAI from 'openai';
 import {z} from 'zod';
 import {zodTextFormat} from 'openai/helpers/zod';
-import type {Detail,FeedResult,Paper} from '../src/types';
+import type {Detail,FeedResult,Paper,TopicOverview} from '../src/types';
 import {discover,getDiscoveredPaper} from './discovery';
 import {fullPaper,paperIdPattern} from './papers';
 import {generateTextPosts,plainWritingRules} from './posts';
 import {editorialVersion} from './editorial';
+import {enrichFigure,figureProtocolVersion} from './figures';
+import {generateTopicOverview,sourceOverview,overviewVersion} from './overview';
 import {PublicCache,digest} from './cache';
 import {allowedModels,hostedOrigins,localOrigins,RequestLimits,ServiceError,boundedJson,safeError} from './security';
 import type {Model} from './security';
@@ -18,12 +20,12 @@ const connectionSchema=z.object({model:modelSchema.optional()}).strict();
 const expandedSchema=z.object({paragraphs:z.array(z.string().max(1000)).min(1).max(3),takeaway:z.string().max(350),limitation:z.string().max(500),sections:z.array(z.string().max(150)).max(5)});
 type ContentFields=Pick<Paper,'headline'|'summary'|'whyItMatters'|'tags'|'figure'|'illustration'>&{evidence?:string[];visualPreference?:'none'|'illustration';contentBasis?:'abstract'|'source-excerpt'};
 export type ServiceOptions={
- mode:'local'|'hosted';ownerKey?:string;defaultModel?:Model;localAccessToken?:string;fetcher?:typeof fetch;requestTimeoutMs?:number;
+ mode:'local'|'hosted';ownerKey?:string;defaultModel?:Model;localAccessToken?:string;fetcher?:typeof fetch;requestTimeoutMs?:number;mediaTimeoutMs?:number;textConcurrency?:number;
  /** Dependency injection keeps tests offline and never needs a real provider key. */
- createClient?:(key:string)=>OpenAI;discovery?:typeof discover;lookupPaper?:typeof getDiscoveredPaper;fullText?:typeof fullPaper;writePosts?:typeof generateTextPosts;
+ createClient?:(key:string)=>OpenAI;discovery?:typeof discover;lookupPaper?:typeof getDiscoveredPaper;fullText?:typeof fullPaper;writePosts?:typeof generateTextPosts;writeOverview?:typeof generateTopicOverview;enrichFigure?:typeof enrichFigure;
 };
 export type RequestContext={ip?:string};
-type StreamEvent={type:'status';message:string}|{type:'card';paper:Paper}|{type:'complete';result:FeedResult}|{type:'error';error:string};
+type StreamEvent={type:'status';message:string}|{type:'card';paper:Paper}|{type:'complete';result:FeedResult}|{type:'error';error:string}|{type:'overview';overview:TopicOverview}|{type:'figure';id:string;figure:NonNullable<Paper['figure']>}|{type:'visual-status';id:string;status:'loading'|'ready'|'unavailable'};
 function contentFields(paper:Paper):ContentFields {
  const p=paper as Paper&ContentFields;
  return {headline:p.headline,summary:p.summary,whyItMatters:p.whyItMatters,tags:p.tags,figure:p.figure,illustration:p.illustration,evidence:p.evidence,visualPreference:p.visualPreference,contentBasis:p.contentBasis};
@@ -36,11 +38,21 @@ function plainPaper(paper:Paper):Paper {
  const {rankingReason:_,...value}=paper as Paper&{rankingReason?:string};return value;
 }
 
+/** Abort a pending phase even if a provider implementation fails to settle promptly. */
+function abortable<T>(promise:Promise<T>,signal:AbortSignal):Promise<T>{
+ if(signal.aborted){void promise.catch(()=>{});return Promise.reject(signal.reason);}
+ return new Promise<T>((resolve,reject)=>{
+  const aborted=()=>{signal.removeEventListener('abort',aborted);reject(signal.reason);};signal.addEventListener('abort',aborted,{once:true});
+  promise.then(value=>{signal.removeEventListener('abort',aborted);resolve(value);},error=>{signal.removeEventListener('abort',aborted);reject(error);});
+ });
+}
+
 /** A Web Request/Response API, shared by the local server and hosted Worker. */
 export function createService(options:ServiceOptions){
  const defaultModel:Model=allowedModels.includes(options.defaultModel as Model)?options.defaultModel!:'gpt-6.1-terra';
  const permittedOrigins=options.mode==='hosted'?hostedOrigins:localOrigins;
- const limits=new RequestLimits();const posts=new PublicCache<ContentFields>(500,24*3600000);const details=new PublicCache<Detail>(200,6*3600000);const known=new PublicCache<Paper>(600,24*3600000);
+ const limits=new RequestLimits();const overviewCache=new PublicCache<TopicOverview>(80,30*60000);const figureCache=new PublicCache<NonNullable<Paper['figure']>|null>(300,15*60000);const posts=new PublicCache<ContentFields>(500,24*3600000);const details=new PublicCache<Detail>(200,6*3600000);const known=new PublicCache<Paper>(600,24*3600000);
+ const brief=options.writeOverview??generateTopicOverview;const illustrate=options.enrichFigure??enrichFigure;
  const search=options.discovery??discover;const lookup=options.lookupPaper??getDiscoveredPaper;const readFullText=options.fullText??fullPaper;const write=options.writePosts??generateTextPosts;
  const clientFor=options.createClient??((apiKey:string)=>new OpenAI({apiKey,timeout:45000,maxRetries:0,...(options.fetcher?{fetch:options.fetcher}:{})}));
 
@@ -48,24 +60,83 @@ export function createService(options:ServiceOptions){
   signal.throwIfAborted();send?.({type:'status',message:'Finding research…'});
   const range=data.range??(data.days===1?'today':data.days===30?'month':'week');
   const found=await search({topic:data.topic,range,sort:data.sort,cursor:data.cursor,exclude:data.exclude,signal,...(data.snapshot?{snapshot:data.snapshot}:{})});
-  signal.throwIfAborted();const papers:Paper[]=[];
+  signal.throwIfAborted();const workCancellation=new AbortController();signal=AbortSignal.any([signal,workCancellation.signal]);
   const eligible=found.papers.filter(paper=>paper.abstract.trim().length>=20);
   const skipped=found.papers.length-eligible.length;
-  // First text posts arrive without fetching article HTML or images.
-  for(let offset=0;offset<eligible.length;offset+=3){
-   signal.throwIfAborted();const batch=eligible.slice(offset,offset+3);
-   const keyed=await Promise.all(batch.map(async paper=>({paper,key:`${editorialVersion}:${model}:${await digest(JSON.stringify([paper.id,paper.updated??paper.published,paper.title,paper.abstract]))}`})));
-   const missing=keyed.filter(item=>!posts.get(item.key));
-   if(missing.length){
-    send?.({type:'status',message:offset===0?'Writing the first posts…':'Preparing more posts…'});
-    const written=await write(ai,model,missing.map(item=>plainPaper(item.paper)),signal);
-    signal.throwIfAborted();const byId=new Map(written.map(p=>[p.id,p]));
-    for(const item of missing){const post=byId.get(item.paper.id);if(!post)throw new ServiceError(502,'Some research posts could not be prepared. Please retry.');posts.set(item.key,contentFields(post));}
+  const keyed=await Promise.all(eligible.map(async paper=>({paper,key:`${editorialVersion}:${model}:${await digest(JSON.stringify([paper.id,paper.updated??paper.published,paper.title,paper.abstract]))}`})));
+  const ready=new Map<string,Paper>();const figures=new Map<string,NonNullable<Paper['figure']>>();
+  let nextEmit=0;
+  const flushReady=()=>{
+   while(nextEmit<keyed.length){const paper=ready.get(keyed[nextEmit].paper.id);if(!paper)break;signal.throwIfAborted();send?.({type:'card',paper});nextEmit++;}
+  };
+  const overviewWithSources=(overview:TopicOverview):TopicOverview=>{
+   const ids=new Set(overview.facts.flatMap(fact=>fact.paperIds));
+   return {...overview,sources:eligible.filter(paper=>ids.has(paper.id)).map(({id,title,url})=>({id,title,url}))};
+  };
+  let overview=sourceOverview(eligible);
+  if(overview){overview=overviewWithSources(overview);send?.({type:'overview',overview});}
+  const assemble=(paper:Paper,content:ContentFields):Paper=>{
+   const value={...paper,...content};const sourceFigure=figures.get(paper.id);
+   if(sourceFigure){value.figure=sourceFigure;delete value.visualPreference;}
+   return value;
+  };
+  const mediaSignal=AbortSignal.any([signal,AbortSignal.timeout(Math.max(1,Math.min(40_000,options.mediaTimeoutMs??40_000)))]);
+  // Only public paper evidence enters these caches, never a query or credential.
+  const overviewTask=(async()=>{
+   if(!eligible.length)return;
+   const key=`${overviewVersion}:${model}:${await digest(JSON.stringify(eligible.map(p=>[p.id,p.updated??p.published,p.abstract])))}`;
+   const cached=overviewCache.get(key);
+   if(cached){overview=overviewWithSources(cached);send?.({type:'overview',overview});return;}
+   const overviewSignal=AbortSignal.any([signal,AbortSignal.timeout(8_000)]);
+   try{const value=await abortable(brief(ai,model,eligible,overviewSignal),overviewSignal);if(value){overview=overviewWithSources(value);overviewCache.set(key,overview);send?.({type:'overview',overview});}}
+   catch{signal.throwIfAborted();} // Keep the instant source briefing if refinement fails.
+  })();
+  let nextFigure=0;
+  const mediaWorker=async()=>{
+   while(nextFigure<keyed.length&&!mediaSignal.aborted){
+    const item=keyed[nextFigure++];send?.({type:'visual-status',id:item.paper.id,status:'loading'});
+    const key=`${figureProtocolVersion}:${model}:${item.key}`;
+    let figure=figureCache.get(key);
+    if(figure===undefined){
+     const singleSignal=AbortSignal.any([mediaSignal,AbortSignal.timeout(20_000)]);
+     try{figure=await abortable(illustrate(ai,model,plainPaper(item.paper),singleSignal),singleSignal)??null;if(!singleSignal.aborted)figureCache.set(key,figure);}
+     catch{figure=null;}
+    }
+    signal.throwIfAborted();
+    if(figure){
+     figures.set(item.paper.id,figure);const value=ready.get(item.paper.id);
+     if(value){value.figure=figure;delete value.visualPreference;known.set(value.id,plainPaper(value));}
+     send?.({type:'figure',id:item.paper.id,figure});send?.({type:'visual-status',id:item.paper.id,status:'ready'});
+    }else send?.({type:'visual-status',id:item.paper.id,status:'unavailable'});
    }
-   for(const item of keyed){signal.throwIfAborted();const paper={...item.paper,...posts.get(item.key)!};papers.push(paper);known.set(paper.id,plainPaper(paper));send?.({type:'card',paper});}
-  }
+  };
+  for(const item of keyed)send?.({type:'visual-status',id:item.paper.id,status:'loading'});
+  const mediaTasks=Array.from({length:Math.min(2,keyed.length)},()=>mediaWorker());
+  let nextBatch=0;
+  const batches:typeof keyed[]=[];for(let offset=0;offset<keyed.length;offset+=3)batches.push(keyed.slice(offset,offset+3));
+  const textWorker=async()=>{
+   while(nextBatch<batches.length){
+    signal.throwIfAborted();const batch=batches[nextBatch++];const missing=batch.filter(item=>!posts.get(item.key));
+    if(missing.length){
+     send?.({type:'status',message:'Writing posts while figures load…'});
+     const written=await abortable(write(ai,model,missing.map(item=>plainPaper(item.paper)),signal),signal);
+     signal.throwIfAborted();const byId=new Map(written.map(p=>[p.id,p]));
+     for(const item of missing){const post=byId.get(item.paper.id);if(!post)throw new ServiceError(502,'Some research posts could not be prepared. Please retry.');posts.set(item.key,contentFields(post));}
+    }
+    for(const item of batch){signal.throwIfAborted();const paper=assemble(item.paper,posts.get(item.key)!);ready.set(paper.id,paper);known.set(paper.id,plainPaper(paper));}flushReady();
+   }
+  };
+  const textWorkers=Array.from({length:Math.min(Math.max(1,Math.min(2,options.textConcurrency??2)),batches.length)},()=>textWorker().catch(error=>{workCancellation.abort(error);throw error;}));
+  void Promise.all(textWorkers).then(()=>{if(!signal.aborted)send?.({type:'status',message:'Posts are ready. Selecting readable figures…'});}).catch(()=>{});
+  // Attach handlers to every independent task before waiting, so cancellation never leaks rejections.
+  const tasks=[...textWorkers,overviewTask,...mediaTasks];
+  const outcomes=await Promise.allSettled(tasks);
+  signal.throwIfAborted();
+  for(let index=0;index<textWorkers.length;index++)if(outcomes[index].status==='rejected')throw (outcomes[index] as PromiseRejectedResult).reason;
+  for(const item of keyed.slice(nextFigure))send?.({type:'visual-status',id:item.paper.id,status:'unavailable'});
+  const papers=eligible.flatMap(paper=>{const value=ready.get(paper.id);return value?[value]:[];});
   const message=[found.message,skipped?`${skipped} ${skipped===1?'result has':'results have'} no usable abstract and ${skipped===1?'was':'were'} skipped.`:undefined].filter(Boolean).join(' ');
-  return {...found,papers,mode:'live',...(message?{message}:{})};
+  return {...found,papers,mode:'live',...(overview?{overview}:{}),...(message?{message}:{})};
  }
 
  async function prepareDetail(id:string,ai:OpenAI,model:Model,signal:AbortSignal):Promise<Detail>{

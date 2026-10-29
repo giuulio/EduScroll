@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mergePaper,mergePapers,validCrop,withFigure} from '../src/feedState';
+import type {Paper,PaperFigure} from '../src/types';
+const paper:Paper={id:'epmc:MED:123',title:'A heart device',authors:['Author'],abstract:'We tested a device in pigs.',published:'2026-10-01',category:'Health',url:'https://europepmc.org/article/MED/123',headline:'A heart device',summary:'We tested a device in pigs.',whyItMatters:'',tags:['Health'],evidence:['We tested a device in pigs.'],visualPreference:'none'};
+const figure:PaperFigure={url:'https://arxiv.org/html/test/figure.png',caption:'A device.',kind:'paper',crop:{x:.1,y:.1,width:.5,height:.6},readable:true};
+test('a source figure remains visible when text originally requested no illustration',()=>{const merged=withFigure(paper,figure);assert.equal(merged.figure,figure);assert.equal(merged.visualPreference,undefined);assert.equal(merged.summary,paper.summary);assert.deepEqual(merged.evidence,paper.evidence);});
+test('late text and complete results cannot overwrite an independently selected source figure',()=>{const enriched=withFigure(paper,figure);const late={...paper,summary:'Updated text',figure:{url:'data:image/svg+xml,test',caption:'Concept',kind:'illustration' as const}};const merged=mergePaper(enriched,late);assert.equal(merged.figure,figure);assert.equal(merged.summary,'Updated text');assert.equal(merged.visualPreference,undefined);assert.equal(mergePapers([enriched],[late]).length,1);});
+test('new source figure selection replaces an earlier selection without losing the post',()=>{const next={...figure,caption:'A clearer panel'};assert.equal(mergePaper(withFigure(paper,figure),withFigure(paper,next)).figure,next);});
+test('crop rendering only accepts finite, bounded, useful rectangles',()=>{assert.equal(validCrop(figure.crop),true);for(const crop of [{x:-.1,y:0,width:.5,height:.5},{x:.8,y:0,width:.5,height:.5},{x:0,y:0,width:.01,height:1},{x:0,y:NaN,width:1,height:1}])assert.equal(validCrop(crop),false);});

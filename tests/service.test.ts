@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import type OpenAI from 'openai';
 import {createService} from '../server/service';
 import type {ServiceOptions} from '../server/service';
-import type {Paper,FeedResult} from '../src/types';
+import type {Paper,FeedResult,TopicOverview} from '../src/types';
 import type {GroundedPaper} from '../server/posts';
 import {PublicCache} from '../server/cache';
 
@@ -14,7 +14,7 @@ const paper:Paper={id:'2610.12345v1',title:'Robot learning from video',abstract:
 const publicPaper=(id:string):Paper=>({...paper,id,url:`https://arxiv.org/abs/${id}`});
 function written(p:Paper):GroundedPaper{return {...p,headline:'Robots learn actions from video',summary:'In 15 tests, robots completed 12 tasks after learning from video.',whyItMatters:'',tags:['Robotics'],evidence:[p.abstract],visualPreference:'none',contentBasis:'abstract'};}
 const fakeClient={models:{retrieve:async()=>({id:'gpt-6.1-terra'})},responses:{parse:async()=>({output_parsed:{paragraphs:['Robots learned actions from video.'],takeaway:'The experiment tested learning from video.',limitation:'No specific limitation was extracted; consult the original source.',sections:['Results']}})}} as unknown as OpenAI;
-const baseOptions:ServiceOptions={mode:'hosted',createClient:()=>fakeClient,discovery:async()=>({papers:[paper],nextCursor:1,hasMore:false,mode:'live',snapshot:'test-snapshot'}),writePosts:async(_ai,_model,papers)=>papers.map(written),lookupPaper:async()=>paper};
+const baseOptions:ServiceOptions={mode:'hosted',createClient:()=>fakeClient,discovery:async()=>({papers:[paper],nextCursor:1,hasMore:false,mode:'live',snapshot:'test-snapshot'}),writePosts:async(_ai,_model,papers)=>papers.map(written),writeOverview:async()=>undefined,enrichFigure:async()=>undefined,lookupPaper:async()=>paper};
 function request(path:string,body:unknown,key:string|null=fakeKey,extra:{headers?:Record<string,string>;signal?:AbortSignal;host?:string}={}){
  return new Request(`${extra.host??'https://api.example.test'}${path}`,{method:'POST',headers:{Origin:origin,'Content-Type':'application/json',...(key?{Authorization:`Bearer ${key}`} :{}),...extra.headers},body:JSON.stringify(body),signal:extra.signal});
 }
@@ -67,10 +67,10 @@ test('NDJSON delivers first three cards before waiting for the next batch, with 
  const result=events.find(event=>event.type==='complete').result as FeedResult;assert.equal(result.snapshot,'stable-order');assert.equal(result.expanded,true);assert.equal(result.papers.length,4);assert.equal(result.nextCursor,4);
 });
 
-test('stream cancellation propagates to active writing and does not start later batches',async()=>{
+test('stream cancellation stops both active text workers and does not start queued batches',async()=>{
  let started!:()=>void;const writing=new Promise<void>(resolve=>{started=resolve;});let stopped!:()=>void;const aborted=new Promise<void>(resolve=>{stopped=resolve;});let calls=0;
- const handle=createService({...baseOptions,discovery:async()=>({papers:[paper,publicPaper('2610.12346'),publicPaper('2610.12347'),publicPaper('2610.12348')],nextCursor:4,hasMore:false,mode:'live'}),writePosts:async(_ai,_model,_papers,signal)=>{calls++;started();await new Promise<void>((_resolve,reject)=>signal!.addEventListener('abort',()=>{stopped();reject(new DOMException('Stopped','AbortError'));},{once:true}));return [];}});
- const response=await handle(request('/api/feed',{topic:'robots'},fakeKey,{headers:{Accept:'application/x-ndjson'}}));const reader=response.body!.getReader();await writing;await reader.cancel();await aborted;assert.equal(calls,1);
+ const handle=createService({...baseOptions,discovery:async()=>({papers:[paper,...Array.from({length:6},(_,i)=>publicPaper(`2610.${12346+i}`))],nextCursor:4,hasMore:false,mode:'live'}),writePosts:async(_ai,_model,_papers,signal)=>{calls++;started();await new Promise<void>((_resolve,reject)=>signal!.addEventListener('abort',()=>{stopped();reject(new DOMException('Stopped','AbortError'));},{once:true}));return [];}});
+ const response=await handle(request('/api/feed',{topic:'robots'},fakeKey,{headers:{Accept:'application/x-ndjson'}}));const reader=response.body!.getReader();await writing;await reader.cancel();await aborted;assert.equal(calls,2);
 });
 
 test('a backend deadline aborts active work and sends an actionable stream error',async()=>{
@@ -112,4 +112,75 @@ test('per-visitor concurrency rejects a third active request and releases slots 
 
 test('bounded public caches evict older entries rather than grow indefinitely',()=>{
  const cache=new PublicCache<number>(2,60000);cache.set('paper-a',1);cache.set('paper-b',2);assert.equal(cache.get('paper-a'),1);cache.set('paper-c',3);assert.equal(cache.size,2);assert.equal(cache.get('paper-b'),undefined);assert.equal(cache.get('paper-a'),1);
+});
+
+
+const sourceFigure:NonNullable<Paper['figure']>={url:'https://arxiv.org/html/2610.12345v1/figure.png',caption:'The tested robot holding a cup.',kind:'paper',readable:true,crop:{x:.05,y:.1,width:.6,height:.75},sourceUrl:paper.url,panel:'a'};
+function overviewFor(p:Paper):TopicOverview{return {title:'Robot learning results',basis:'retrieved-papers',facts:[{text:'Robots completed 12 tasks in 15 tests.',paperIds:[p.id],evidence:[p.abstract]}]};}
+async function streamEvents(response:Response){return (await response.text()).trim().split('\n').filter(Boolean).map(line=>JSON.parse(line));}
+
+test('source briefing is instant and overview refinement runs concurrently with text',async()=>{
+ let releaseText!:()=>void;const textGate=new Promise<void>(resolve=>{releaseText=resolve;});
+ let releaseOverview!:()=>void;const overviewGate=new Promise<void>(resolve=>{releaseOverview=resolve;});
+ let textStarted=false,overviewStarted=false;let markStarted!:()=>void;const bothStarted=new Promise<void>(resolve=>{markStarted=resolve;});
+ const handle=createService({...baseOptions,writePosts:async(_ai,_model,batch)=>{textStarted=true;await textGate;return batch.map(written);},writeOverview:async()=>{overviewStarted=true;markStarted();await overviewGate;return overviewFor(paper);}});
+ const response=await handle(request('/api/feed',{topic:'robotics'},fakeKey,{headers:{Accept:'application/x-ndjson'}}));
+ const reader=response.body!.getReader();const decoder=new TextDecoder();let content='';
+ while(!content.includes('"type":"overview"')){const chunk=await reader.read();assert.equal(chunk.done,false);content+=decoder.decode(chunk.value);}
+ await bothStarted;assert.equal(textStarted,true);assert.equal(overviewStarted,true);assert.equal(content.includes('"type":"card"'),false);
+ const instant=content.split('\n').filter(Boolean).map(line=>JSON.parse(line)).find(event=>event.type==='overview');assert.equal(instant.overview.sources[0].url,paper.url);
+ releaseOverview();
+ while(!content.includes('Robot learning results')){const chunk=await reader.read();assert.equal(chunk.done,false);content+=decoder.decode(chunk.value);}
+ assert.equal(content.includes('"type":"card"'),false);releaseText();
+ for(;;){const chunk=await reader.read();if(chunk.done)break;content+=decoder.decode(chunk.value);}
+ const complete=content.split('\n').filter(Boolean).map(line=>JSON.parse(line)).find(event=>event.type==='complete');assert.equal(complete.result.overview.title,'Robot learning results');
+});
+
+test('text cards arrive before slow figure selection and late crop patches survive complete',async()=>{
+ let releaseFigure!:()=>void;const gate=new Promise<void>(resolve=>{releaseFigure=resolve;});let selecting=false;
+ const handle=createService({...baseOptions,enrichFigure:async()=>{selecting=true;await gate;return sourceFigure;}});
+ const response=await handle(request('/api/feed',{topic:'robots'},fakeKey,{headers:{Accept:'application/x-ndjson'}}));const reader=response.body!.getReader();const decoder=new TextDecoder();let content='';
+ while(!content.includes('"type":"card"')){const chunk=await reader.read();assert.equal(chunk.done,false);content+=decoder.decode(chunk.value);}
+ assert.equal(selecting,true);assert.equal(content.includes('"type":"complete"'),false);releaseFigure();
+ for(;;){const chunk=await reader.read();if(chunk.done)break;content+=decoder.decode(chunk.value);}
+ const events=content.split('\n').filter(Boolean).map(line=>JSON.parse(line));assert.deepEqual(events.find(event=>event.type==='figure').figure.crop,sourceFigure.crop);
+ const final=events.find(event=>event.type==='complete').result.papers[0];assert.equal(final.figure.kind,'paper');assert.equal(final.visualPreference,undefined);
+});
+
+test('a figure that finishes before text is retained in the card and final ordered results',async()=>{
+ const handle=createService({...baseOptions,enrichFigure:async()=>sourceFigure,writePosts:async(_ai,_model,batch)=>{await new Promise(resolve=>setTimeout(resolve,5));return batch.map(written);}});
+ const events=await streamEvents(await handle(request('/api/feed',{topic:'robots'},fakeKey,{headers:{Accept:'application/x-ndjson'}})));
+ assert.equal(events.findIndex(event=>event.type==='figure')<events.findIndex(event=>event.type==='card'),true);
+ assert.equal(events.find(event=>event.type==='card').paper.figure.url,sourceFigure.url);assert.equal(events.at(-1).result.papers[0].figure.url,sourceFigure.url);
+});
+
+test('overview and figure failures do not fail readable posts',async()=>{
+ const handle=createService({...baseOptions,enrichFigure:async()=>{throw new Error('Image unavailable');},writeOverview:async()=>{throw new Error('Overview unavailable');}});
+ const events=await streamEvents(await handle(request('/api/feed',{topic:'robots'},fakeKey,{headers:{Accept:'application/x-ndjson'}})));
+ assert.equal(events.some(event=>event.type==='error'),false);assert.equal(events.filter(event=>event.type==='card').length,1);assert.equal(events.at(-1).type,'complete');assert.ok(events.at(-1).result.overview);assert.ok(events.some(event=>event.type==='visual-status'&&event.status==='unavailable'));
+});
+
+test('media deadline stops active selections and skips queued figures without delaying text',async()=>{
+ let started=0,stopped=0;const keepAlive=setTimeout(()=>{},200);
+ const handle=createService({...baseOptions,mediaTimeoutMs:15,discovery:async()=>({papers:[paper,publicPaper('2610.12346'),publicPaper('2610.12347')],nextCursor:3,hasMore:false,mode:'live'}),enrichFigure:async(_ai,_model,_paper,signal)=>{started++;await new Promise<void>((_resolve,reject)=>signal!.addEventListener('abort',()=>{stopped++;reject(signal!.reason);},{once:true}));return undefined;}});
+ try{const events=await streamEvents(await handle(request('/api/feed',{topic:'robots'},fakeKey,{headers:{Accept:'application/x-ndjson'}})));assert.equal(started,2);assert.equal(stopped,2);assert.equal(events.filter(event=>event.type==='card').length,3);assert.equal(events.at(-1).type,'complete');assert.equal(events.filter(event=>event.type==='visual-status'&&event.status==='unavailable').length,3);}finally{clearTimeout(keepAlive);}
+});
+
+
+test('a later text batch can finish first without emitting cards out of ranked order',async()=>{
+ let releaseFirst!:()=>void;const firstGate=new Promise<void>(resolve=>{releaseFirst=resolve;});
+ let laterFinished!:()=>void;const laterDone=new Promise<void>(resolve=>{laterFinished=resolve;});
+ let releaseMedia!:()=>void;const mediaGate=new Promise<void>(resolve=>{releaseMedia=resolve;});
+ const papers=[paper,publicPaper('2610.12346'),publicPaper('2610.12347'),publicPaper('2610.12348')];
+ const handle=createService({...baseOptions,discovery:async()=>({papers,nextCursor:4,hasMore:false,mode:'live'}),writePosts:async(_ai,_model,batch)=>{if(batch[0].id===paper.id)await firstGate;else laterFinished();return batch.map(written);},enrichFigure:async()=>{await mediaGate;return sourceFigure;}});
+ const response=await handle(request('/api/feed',{topic:'robots'},fakeKey,{headers:{Accept:'application/x-ndjson'}}));
+ await laterDone;await Promise.resolve();releaseMedia();
+ const reader=response.body!.getReader();const decoder=new TextDecoder();let content='';
+ // Media is released after the later batch completes, giving a deterministic stream marker.
+ while(!content.includes('"type":"figure"')){const chunk=await reader.read();assert.equal(chunk.done,false);content+=decoder.decode(chunk.value);}
+ assert.equal(content.includes('"type":"card"'),false);
+ releaseFirst();for(;;){const chunk=await reader.read();if(chunk.done)break;content+=decoder.decode(chunk.value);}
+ const events=content.split('\n').filter(Boolean).map(line=>JSON.parse(line));
+ assert.deepEqual(events.filter(event=>event.type==='card').map(event=>event.paper.id),papers.map(p=>p.id));
+ assert.deepEqual(events.find(event=>event.type==='complete').result.papers.map((p:Paper)=>p.id),papers.map(p=>p.id));
 });
