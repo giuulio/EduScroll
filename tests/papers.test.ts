@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {queryFor,parseFeed,extractArticle,paperIdPattern} from '../server/papers';
+import {queryFor,discoveryQueryFor,parseFeed,extractArticle,paperIdPattern} from '../server/papers';
 
 const now=new Date('2026-10-28T17:00:00Z');
 test('today uses today, and a week includes seven calendar dates',()=>{
@@ -12,6 +12,16 @@ test('topic input cannot introduce an arXiv field or boolean expression',()=>{
  assert.ok(!query.includes('cat:secret'));
  assert.match(query,/all:robots AND all:OR AND all:cat AND all:secret/);
  assert.throws(()=>queryFor('!!!',7,now));
+});
+test('discovery queries use concepts and UTC calendar month boundaries',()=>{
+ const query=discoveryQueryFor('novel nanotech for pacemakers','month',now);
+ assert.match(query,/all:"nanotechnology" OR all:"nanomaterial" OR all:"nanoscale"/);
+ assert.match(query,/all:"pacemaker" OR all:"cardiac pacing"/);
+ assert.match(query,/202610010000 TO 202610282359/);
+ assert.ok(!query.includes('all:"novel"')&&!query.includes('all:"for"'));
+ const injection=discoveryQueryFor('robots") OR cat:secret','any',now);
+ assert.ok(!injection.includes('cat:secret'));
+ assert.match(injection,/all:"cat"/);
 });
 test('parses an Atom feed and deduplicates versions of the same paper',()=>{
  const entry=(id:string)=>`<entry><id>http://arxiv.org/abs/${id}</id><title> Test\n paper </title><published>2026-10-28</published><summary>An abstract.</summary><author><name>A Researcher</name></author><category term="cs.AI"/></entry>`;
