@@ -12,27 +12,24 @@
     "abstract": "Novel view synthesis and 3D reconstruction have advanced rapidly with radiance fields and splatting, yet their memory and computational demands limit their use in resource-constrained settings. We introduce Hexels: novel planar hexagonal surface elements with a first-order spatial color field for efficient 3D scene and 2D image representation. Hexels exploit locally planar regions with smoothly varying appearance using fewer, larger primitives. Their hexagonal support provides an area- and boundary-efficient domain, while the local color field captures appearance variation within each primitive. Across 34 scenes, Hexels improve PSNR over memory-matched 2DGS by 4.53-7.38 dB across datasets while requiring lower training VRAM. We further ablate Hexels by showing that per primitive, Hexels outperform 2DGS by upto 4.74 dB while using lower training VRAM and having 2.31 times faster FPS. Even in unconstrained settings, Hexels offers complementary quality-memory trade-offs. For efficient 3D surface reconstruction, Hexels reduce error by 28.9% compared with memory-matched 2DGS across 15 DTU scans. On 6 Tanks and Temples surface scenes, Hexels achieves the highest mean F1 among compared methods (34.38%, versus 31.72% for 2DGS). We further also show that Hexels, as a general primitive, improves 2D image representation over Image-GS. Hexels push the Pareto frontier on the quality-efficiency trade-off of surface-aligned primitives.",
     "url": "https://arxiv.org/abs/2610.37668v1",
     "headline": "Hexagons make compact pictures of scenes",
-    "summary": "Researchers built 3D scenes from tiny, hexagon-shaped pieces. In tests, they captured more detail than another method using the same amount of memory.",
+    "summary": "Rebuilding 3D surfaces with hexagon-shaped pieces cut error by about 29% across 15 test scans. The comparison method used the same amount of memory.",
     "whyItMatters": "More compact scene representations could reduce the resources needed to render them.",
     "tags": [
       "Computer graphics"
     ],
     "illustration": {
-      "layout": "pipeline",
+      "layout": "hexagons",
       "labels": [
-        "Scene",
-        "Hexagons",
-        "Reconstruction"
+        "Surface pieces",
+        "Hexagonal shape"
       ],
       "accent": "purple",
-      "caption": "Hexagonal surfaces represent a scene."
+      "caption": "Conceptual hexagonal pieces for representing a surface."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23f5f1fb%22%2F%3E%3Cpath%20d%3D%22M163%20190L270%20190%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Cpath%20d%3D%22M371%20190L477%20190%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Ccircle%20cx%3D%22112%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23e6ddf7%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23e6ddf7%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22528%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23e6ddf7%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M100%20178h24v24h-24zM307%20190l13-17%2013%2017-13%2017z%22%20fill%3D%22none%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M515%20190l9%2010%2018-22%22%20fill%3D%22none%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Ctext%20x%3D%22112%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%237354c8%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EScene%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%237354c8%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EHexagons%3C%2Ftext%3E%3Ctext%20x%3D%22528%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%237354c8%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EReconstruction%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%237354c8%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "Hexagonal surfaces represent a scene.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "For efficient 3D surface reconstruction, Hexels reduce error by 28.9% compared with memory-matched 2DGS across 15 DTU scans."
+    ],
+    "editorialVersion": "eduscroll-editorial-v1"
   },
   {
     "id": "2610.37666v1",
@@ -51,28 +48,26 @@
     "abstract": "Vision-Language-Action (VLA) models have made substantial progress in robotic manipulation, but their generalization remains constrained by the diversity and coverage of action-labeled robot demonstrations. Human videos provide much broader behavioral and environmental experience, while learning from them faces a fundamental trade-off between scalable data and explicit action grounding. We introduce ThinkWorld, a VLA learning framework that grounds action reasoning in world dynamics and strengthens it through reinforcement learning with world imagination. ThinkWorld represents each action thought as a Chain-of-Dynamics (CoD), a sequence of discrete motion tokens that captures the intermediate dynamics connecting the current world to a future state and serves as a common action representation across embodiments. We first initialize CoD with action-labeled demonstrations, then predict the future induced by each CoD and reinforce those whose predictions better match the observed outcome. This enables videos without action annotations to provide direct supervision from observed state transitions, allowing human and robot experience to refine the same reasoning space. Experiments in simulation and on real robots demonstrate effective human-to-robot transfer and strong generalization to unseen tasks and environments.",
     "url": "https://arxiv.org/abs/2610.37666v1",
     "headline": "Robots learn from watching people move",
-    "summary": "Robots can learn from videos of people as well as robot demonstrations. In tests, this approach helped them handle tasks and settings they hadn't seen before.",
+    "summary": "Robots can learn movements from human videos without someone labelling every action. Tests in simulation and on real robots found that this helped them handle unfamiliar tasks and settings.",
     "whyItMatters": "Human videos offer a wider range of experiences than robot demonstrations alone.",
     "tags": [
       "Robotics",
       "Learning"
     ],
     "illustration": {
-      "layout": "pipeline",
+      "layout": "robot",
       "labels": [
-        "Human video",
-        "Motion",
-        "Robot action"
+        "Learning to move",
+        "Human video"
       ],
       "accent": "blue",
-      "caption": "Learning connects observed motion with robot actions."
+      "caption": "A conceptual robot arm representing learning from human movement."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23eff6fb%22%2F%3E%3Cpath%20d%3D%22M163%20190L270%20190%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Cpath%20d%3D%22M371%20190L477%20190%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Ccircle%20cx%3D%22112%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22528%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M100%20178h24v24h-24zM307%20190l13-17%2013%2017-13%2017z%22%20fill%3D%22none%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M515%20190l9%2010%2018-22%22%20fill%3D%22none%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Ctext%20x%3D%22112%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%233778b2%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EHuman%20video%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%233778b2%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EMotion%3C%2Ftext%3E%3Ctext%20x%3D%22528%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%233778b2%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3ERobot%20action%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%233778b2%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "Learning connects observed motion with robot actions.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "This enables videos without action annotations to provide direct supervision from observed state transitions, allowing human and robot experience to refine the same reasoning space.",
+      "Experiments in simulation and on real robots demonstrate effective human-to-robot transfer and strong generalization to unseen tasks and environments."
+    ],
+    "editorialVersion": "eduscroll-editorial-v1"
   },
   {
     "id": "2610.37656v1",
@@ -87,7 +82,7 @@
     "abstract": "Relations compose through the entity they share - Alice is Bob's mother and Bob is Carol's father, so Alice is Carol's grandmother - and the order matters, since a father's mother is not a mother's father; verifying a composed relation means closing the loop. We show that if each entity's coordinate frame may be rotated independently (per-entity frame freedom), three things follow. In the pure-gauge sector, relations that share no cycle cannot interact at all. The only gauge-invariant score of a triangle is a class function of its holonomy $H = T_{ij} T_{jk} T_{ki}$ - a Wilson loop. And the only equivariant update of an edge is $U = Ψ(H)\\, T_{ij}$ with $Ψ$ conjugation-equivariant. Edge attention by Wilson loops is therefore not one design among many but the unique form the symmetry permits. Three communities hold pieces of this form: the commuting-operator embeddings of knowledge graphs are its abelian (commuting) sector; AlphaFold's triangle update and the Edge Transformer have its shape - an edge updated through the third vertex - without its constraints; and lattice QCD builds it equivariantly on lattices. We instantiate the equivariant sub-family on general relational graphs as holonomy attention. With no training and composition alone, it infers unobserved $S_4$ relations on sparse graphs at 0.88 with a fifth of the edges corrupted, at or slightly below specialist synchronization algorithms, where every commutative architecture is capped at 0.083; its holonomy score flags corrupted triangles at AUC 0.99 where commuting scores are capped at 0.76 by a second selection rule, and it separates clusters without labels.",
     "url": "https://arxiv.org/abs/2610.37656v1",
     "headline": "Why relationship loops matter for reasoning",
-    "summary": "The order of connections matters when AI links facts. In tests, a new method could fill in missing links even when some information was wrong.",
+    "summary": "A math-inspired system recovered missing relationships even when a fifth of its test graph’s connections were corrupted. It needed no training.",
     "whyItMatters": "The work offers a way to study reasoning over connected relationships.",
     "tags": [
       "Mathematics",
@@ -96,19 +91,16 @@
     "illustration": {
       "layout": "network",
       "labels": [
-        "First entity",
-        "Second entity",
-        "Third entity"
+        "Related facts"
       ],
       "accent": "purple",
-      "caption": "A closed loop connects three relationships."
+      "caption": "Conceptual links between facts, not a measured result."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23f5f1fb%22%2F%3E%3Cpath%20d%3D%22M320%20185L180%20125M180%20125L320%2080%22%20stroke%3D%22%237354c8%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L320%2080M320%2080L460%20125%22%20stroke%3D%22%237354c8%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L460%20125M460%20125L450%20245%22%20stroke%3D%22%237354c8%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L450%20245M450%20245L320%20290%22%20stroke%3D%22%237354c8%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L320%20290M320%20290L190%20245%22%20stroke%3D%22%237354c8%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L190%20245M190%20245L180%20125%22%20stroke%3D%22%237354c8%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%22180%22%20cy%3D%22125%22%20r%3D%2223%22%20fill%3D%22%23e6ddf7%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%2280%22%20r%3D%2223%22%20fill%3D%22%23e6ddf7%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22460%22%20cy%3D%22125%22%20r%3D%2223%22%20fill%3D%22%23e6ddf7%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22450%22%20cy%3D%22245%22%20r%3D%2223%22%20fill%3D%22%23e6ddf7%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22290%22%20r%3D%2223%22%20fill%3D%22%23e6ddf7%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22190%22%20cy%3D%22245%22%20r%3D%2223%22%20fill%3D%22%23e6ddf7%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22185%22%20r%3D%2242%22%20fill%3D%22%23e6ddf7%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22185%22%20r%3D%2212%22%20fill%3D%22%237354c8%22%2F%3E%3Ctext%20x%3D%22160%22%20y%3D%22335%22%20text-anchor%3D%22middle%22%20fill%3D%22%237354c8%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EFirst%20entity%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22365%22%20text-anchor%3D%22middle%22%20fill%3D%22%237354c8%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3ESecond%20entity%3C%2Ftext%3E%3Ctext%20x%3D%22480%22%20y%3D%22335%22%20text-anchor%3D%22middle%22%20fill%3D%22%237354c8%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EThird%20entity%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%237354c8%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "A closed loop connects three relationships.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "With no training and composition alone, it infers unobserved $S_4$ relations on sparse graphs at 0.88 with a fifth of the edges corrupted, at or slightly below specialist synchronization algorithms, where every commutative architecture is capped at 0.083;"
+    ],
+    "editorialVersion": "eduscroll-editorial-v1",
+    "visualPreference": "none"
   },
   {
     "id": "2610.37655v1",
@@ -123,28 +115,24 @@
     "abstract": "Atmospheric chemical mechanisms are commonly distributed in the language of the Kinetic PreProcessor (KPP), which generates efficient Fortran or C code but does not fit into the differentiable programming frameworks in which machine-learning models are developed. We present KPPax, a kinetic preprocessor that generates differentiable, just-in-time compiled, and vectorisable chemistry code in JAX from mechanisms written in the KPP language. KPPax evaluates the rate law with sparse operations in log space, which keeps it differentiable, and integrates the stiff system with the implicit solvers and the forward- and reverse-mode adjoints of the \\texttt{diffrax} library, so that exact sensitivities are obtained without hand-derived adjoint code. We demonstrate two applications with the POLLU benchmark mechanism. In the first, the Fisher information matrix computed from an automatically differentiated Jacobian predicts, before any fit, which of the 25 rate coefficients a flow-tube-like design can identify, and noisy synthetic estimation confirms the predicted uncertainties of the nine identifiable rate coefficients to within about 30\\% while revealing clusters of fast reactions of which only ratios are constrained. In the second, a neural-network correction of an emission inventory is trained offline on per-scenario 4D-Var retrievals and then fine-tuned online through the chemical model, which reduces the error of the biogenic correction by a factor of 2.4--5 and recovers information on low-temperature emissions that the individual retrievals lose. KPPax makes KPP mechanisms directly usable for parameter estimation and hybrid physics--machine-learning modelling.",
     "url": "https://arxiv.org/abs/2610.37655v1",
     "headline": "Making air chemistry easier to study",
-    "summary": "New software connects models of chemical reactions in the air to machine learning. In simulated tests, it helped estimate reaction rates and emissions.",
+    "summary": "A simulated air-chemistry experiment could identify only 9 of 25 reaction rates. New software predicted which ones before trying to fit the data.",
     "whyItMatters": "These calculations can help researchers adjust and analyze models of atmospheric chemistry.",
     "tags": [
       "Atmosphere",
       "Chemistry"
     ],
     "illustration": {
-      "layout": "pipeline",
+      "layout": "orbit",
       "labels": [
-        "Reactions",
-        "Chemistry model",
-        "Changes"
+        "Air chemistry"
       ],
       "accent": "green",
-      "caption": "A chemistry model tracks how changes affect outcomes."
+      "caption": "Conceptual connected particles representing chemical reactions."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23eff7f2%22%2F%3E%3Cpath%20d%3D%22M163%20190L270%20190%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Cpath%20d%3D%22M371%20190L477%20190%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Ccircle%20cx%3D%22112%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d6ebe0%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d6ebe0%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22528%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d6ebe0%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M100%20178h24v24h-24zM307%20190l13-17%2013%2017-13%2017z%22%20fill%3D%22none%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M515%20190l9%2010%2018-22%22%20fill%3D%22none%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Ctext%20x%3D%22112%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%2341856a%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EReactions%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%2341856a%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EChemistry%20model%3C%2Ftext%3E%3Ctext%20x%3D%22528%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%2341856a%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EChanges%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%2341856a%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "A chemistry model tracks how changes affect outcomes.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "In the first, the Fisher information matrix computed from an automatically differentiated Jacobian predicts, before any fit, which of the 25 rate coefficients a flow-tube-like design can identify, and noisy synthetic estimation confirms the predicted uncertainties of the nine identifiable rate coefficients"
+    ],
+    "editorialVersion": "eduscroll-editorial-v1"
   },
   {
     "id": "2610.37649v1",
@@ -160,28 +148,31 @@
     "abstract": "Scientific discovery often begins with an unexpected observation that prompts a new research question. In a world with altered physical laws, can large language models (LLMs) notice unexpected behavior, such as heavier objects falling more slowly, and discover the law through experiments without being told what to investigate? To evaluate this ability, we introduce LongChang, an automated framework that creates simulated worlds with altered physics, where one or more laws differ from ordinary physics. The evaluated LLMs act as explorers, manipulating objects and building tools to investigate their own questions without research tasks or hints about these laws. Separate LLM agents generate and review scenes, review tool designs, and evaluate reports for correctness and experimental support using the altered physical laws and exploration records. These records guide scene evolution for further exploration, allowing the full cycle to run without human intervention. Among 12 LLMs, GPT-6-Astra achieves a discovery rate of 16.7%, while the other 11 score 0%. The exploration records reveal uninvestigated anomalies and only partial identification of the altered physical laws.",
     "url": "https://arxiv.org/abs/2610.37649v1",
     "headline": "Can an AI discover unfamiliar physics?",
-    "summary": "AI explored simulated worlds with unusual physics, without being told what to look for. Most models couldn't work out the changed rules.",
+    "summary": "AI explored worlds where physics worked differently. Of 12 models tested, 11 had a 0% discovery rate; the best reached 16.7%.",
     "whyItMatters": "The tests explore whether models can notice surprises and investigate them independently.",
     "tags": [
       "Artificial intelligence",
       "Physics"
     ],
     "illustration": {
-      "layout": "pipeline",
+      "layout": "orbit",
       "labels": [
-        "Strange world",
-        "Experiments",
-        "Possible law"
+        "Altered physics"
       ],
       "accent": "orange",
-      "caption": "An explorer investigates an unfamiliar simulated world."
+      "caption": "A conceptual world with unfamiliar physical rules."
     },
     "figure": {
       "url": "https://arxiv.org/html/2610.37649v1/longchang_world.png",
       "caption": "A simulated glass room contains objects for exploring unfamiliar physical laws.",
       "kind": "paper",
       "readable": true
-    }
+    },
+    "evidence": [
+      "The evaluated LLMs act as explorers, manipulating objects and building tools to investigate their own questions without research tasks or hints about these laws.",
+      "Among 12 LLMs, GPT-6-Astra achieves a discovery rate of 16.7%, while the other 11 score 0%."
+    ],
+    "editorialVersion": "eduscroll-editorial-v1"
   },
   {
     "id": "2610.37647v1",
@@ -196,28 +187,25 @@
     "abstract": "Weight decay and explicit weight-norm constraints improve optimizer performance in language model pretraining, yet a unified understanding of why such control helps and how much is needed remains incomplete. We analyze norm control in Muon over the entire training trajectory using the \\emph{accumulated effective learning rate}, $C_T=\\sum_{t<T}η_t/\\|W_t\\|_F$, where $η_t$ is the nominal learning rate and $η_t/\\|W_t\\|_F$ is the effective learning rate relative to the weight norm. For bounded update directions, accumulation over any training interval bounds relative weight displacement. We show that vanilla Muon can accumulate only logarithmically, potentially limiting exploration and helping explain its slower empirical progress, whereas MuonW and MuonH guarantee at least linear accumulation under the stated conditions. Going beyond bounded-norm control, we show that sufficiently slow norm growth guarantees faster accumulation than the logarithmic worst case, opening up less restrictive optimizer designs. Based on this insight, we propose MuonGS, which uses Gram--Schmidt (GS) projection to remove the radial component of each Muon update without fixing the weight norm. With bounded update directions and a constant nominal learning rate, we prove that the weight norm grows at most proportionally to $\\sqrt{t}$ after $t$ steps. Consequently, MuonGS guarantees $C_T=Ω(\\sqrt{T})$, with accumulation sustained even in later training. Further, for smooth scale-invariant objectives we establish its $O(T^{-1/2})$ stationarity guarantee. In pretraining experiments with 160M- and 400M-parameter dense models as well as a 135M active- and 1B total- parameter MoE model, MuonGS achieves lower validation perplexity than MuonH at long training horizons. In particular, for the dense model it achieves an estimated token-equivalent speedup up to about $15\\%$ at matched validation loss to MuonH.",
     "url": "https://arxiv.org/abs/2610.37647v1",
     "headline": "A different way to train language models",
-    "summary": "Researchers changed how AI adjusts itself while learning. In their tests, the new training rule helped small language models learn more efficiently.",
+    "summary": "The authors estimate up to about a 15% training-efficiency gain from a new update rule for a small language model. The estimate compares training tokens at the same test loss.",
     "whyItMatters": "Training methods affect how much a model learns from its data.",
     "tags": [
       "Language models",
       "Training"
     ],
     "illustration": {
-      "layout": "pipeline",
+      "layout": "layers",
       "labels": [
-        "Training data",
-        "Adjustments",
-        "Language model"
+        "Model training"
       ],
       "accent": "blue",
-      "caption": "A revised update guides model training."
+      "caption": "Conceptual training layers, not measured training performance."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23eff6fb%22%2F%3E%3Cpath%20d%3D%22M163%20190L270%20190%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Cpath%20d%3D%22M371%20190L477%20190%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Ccircle%20cx%3D%22112%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22528%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M100%20178h24v24h-24zM307%20190l13-17%2013%2017-13%2017z%22%20fill%3D%22none%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M515%20190l9%2010%2018-22%22%20fill%3D%22none%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Ctext%20x%3D%22112%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%233778b2%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3ETraining%20data%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%233778b2%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EAdjustments%3C%2Ftext%3E%3Ctext%20x%3D%22528%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%233778b2%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3ELanguage%20model%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%233778b2%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "A revised update guides model training.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "In particular, for the dense model it achieves an estimated token-equivalent speedup up to about $15\\%$ at matched validation loss to MuonH."
+    ],
+    "editorialVersion": "eduscroll-editorial-v1",
+    "visualPreference": "none"
   },
   {
     "id": "2610.37631v1",
@@ -233,28 +221,26 @@
     "abstract": "Language models pretrained on web corpora collected over multiple years learn both general and domain-specific knowledge. How these different kinds of knowledge are learned as pretraining progresses remains unclear. Recent point-in-time models trained on web snapshots from different years provide a way to probe how knowledge prevalence varies over time. Using these models, we propose a temporal variability score (TVS), defined as the coefficient of variation of an item's negative log-likelihood across models. A higher score suggests that the knowledge may be less consistently represented across years of web text. We evaluate six benchmarks covering diverse topics using six models from multiple open-source model families. We find that low- and high-TVS items are learned similarly early in training, but high-TVS items improve faster later on. At the end of the pretraining run, high-TVS items outperform low-TVS items in 34 of 36 model-benchmark settings, with an average advantage of 7.3 points of chance-normalized accuracy. This pattern is most robust on knowledge-intensive tasks, even when comparing items of similar difficulty. Our findings reveal differences in how knowledge is learned over the course of pretraining, with temporal variability providing a diagnostic of these learning dynamics beyond aggregate benchmark scores.",
     "url": "https://arxiv.org/abs/2610.37631v1",
     "headline": "Some knowledge improves later in training",
-    "summary": "Not all facts are learned at the same pace. In these tests, AI improved faster later in training on facts that appeared less consistently in web data.",
+    "summary": "In 34 of 36 test settings, AI ended up scoring better on facts with less consistent scores across models trained on yearly web snapshots. That advantage emerged late in training.",
     "whyItMatters": "Overall scores can hide differences in when models learn different kinds of knowledge.",
     "tags": [
       "Language models",
       "Learning"
     ],
     "illustration": {
-      "layout": "pipeline",
+      "layout": "layers",
       "labels": [
-        "Web snapshots",
-        "Model training",
-        "Knowledge"
+        "Yearly web data"
       ],
       "accent": "purple",
-      "caption": "Web snapshots help researchers examine learning over time."
+      "caption": "Layers represent successive snapshots of web text."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23f5f1fb%22%2F%3E%3Cpath%20d%3D%22M163%20190L270%20190%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Cpath%20d%3D%22M371%20190L477%20190%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Ccircle%20cx%3D%22112%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23e6ddf7%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23e6ddf7%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22528%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23e6ddf7%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M100%20178h24v24h-24zM307%20190l13-17%2013%2017-13%2017z%22%20fill%3D%22none%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M515%20190l9%2010%2018-22%22%20fill%3D%22none%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Ctext%20x%3D%22112%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%237354c8%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EWeb%20snapshots%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%237354c8%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EModel%20training%3C%2Ftext%3E%3Ctext%20x%3D%22528%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%237354c8%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EKnowledge%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%237354c8%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "Web snapshots help researchers examine learning over time.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "A higher score suggests that the knowledge may be less consistently represented across years of web text.",
+      "We find that low- and high-TVS items are learned similarly early in training, but high-TVS items improve faster later on.",
+      "At the end of the pretraining run, high-TVS items outperform low-TVS items in 34 of 36 model-benchmark settings, with an average advantage of 7.3 points of chance-normalized accuracy."
+    ],
+    "editorialVersion": "eduscroll-editorial-v1"
   },
   {
     "id": "2610.37624v1",
@@ -270,28 +256,25 @@
     "abstract": "When an LLM group's discussion is compressed into a short memory for a final decision maker, what should the memory keep? Two natural heuristics keep the rarest claims or the claims relevant to the decision criteria. On hidden-profile tasks both look attractive, because how widely a fact is held is confounded with whether it helps. We introduce CrossProfile, a diagnostic benchmark of 60 templates with automatically verified answer keys, in which the ownership of supporting, decoy, and irrelevant facts is crossed while their text is held fixed (480 tasks). Across Qwen2.5-7B, Llama-3.1-8B, and two DeepSeek models, both heuristics fail in predictable places. Selecting by relevance readmits decoys, because decoys are on topic: even a perfect relevance filter loses 23 to 31 points to rarest-first selection in the classic hidden-profile configuration. Rarest-first selection is no better than random selection on average and wins only where the rare facts happen to be the useful ones. In both cases accuracy follows the balance of evidence the memory keeps, not the policy that kept it. The decision model adds a third failure, a form of social proof: it gives extra weight to facts attributed to many agents. Removing the attribution tags, or reassigning them at random with line order fixed, raises accuracy in the classic configuration by 13 to 24 points. In natural discussions the evidence is lost before any memory acts: the complete transcript yields lower accuracy than no notes at all.",
     "url": "https://arxiv.org/abs/2610.37624v1",
     "headline": "Short memories can mislead AI groups",
-    "summary": "What an AI team remembers can change its decision. In tests, keeping only the rarest or most relevant facts sometimes kept the wrong evidence.",
+    "summary": "Removing who-said-what labels raised AI decision accuracy by 13–24 percentage points in one test setup. Models had been giving extra weight to claims shared by several agents.",
     "whyItMatters": "A short record can shape a group decision by leaving out important evidence.",
     "tags": [
       "Artificial intelligence",
       "Decision making"
     ],
     "illustration": {
-      "layout": "pipeline",
+      "layout": "documents",
       "labels": [
-        "Discussion",
-        "Short notes",
-        "Decision"
+        "Shared notes"
       ],
       "accent": "orange",
-      "caption": "A discussion is compressed before a decision."
+      "caption": "Conceptual discussion notes whose source labels can influence a decision."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23fcf5ef%22%2F%3E%3Cpath%20d%3D%22M163%20190L270%20190%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Cpath%20d%3D%22M371%20190L477%20190%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Ccircle%20cx%3D%22112%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23f4dfcd%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23f4dfcd%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22528%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23f4dfcd%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M100%20178h24v24h-24zM307%20190l13-17%2013%2017-13%2017z%22%20fill%3D%22none%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M515%20190l9%2010%2018-22%22%20fill%3D%22none%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Ctext%20x%3D%22112%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b96c3c%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EDiscussion%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b96c3c%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EShort%20notes%3C%2Ftext%3E%3Ctext%20x%3D%22528%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b96c3c%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EDecision%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%23b96c3c%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "A discussion is compressed before a decision.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "The decision model adds a third failure, a form of social proof: it gives extra weight to facts attributed to many agents.",
+      "Removing the attribution tags, or reassigning them at random with line order fixed, raises accuracy in the classic configuration by 13 to 24 points."
+    ],
+    "editorialVersion": "eduscroll-editorial-v1"
   },
   {
     "id": "2610.37613v1",
@@ -310,28 +293,25 @@
     "abstract": "Chain-of-thought reasoning has substantially advanced video understanding in multimodal large language models (MLLMs). However, language-based reasoning traces do not provide a reliable mechanism for models to revisit relevant visual evidence, leading to visual forgetting and impairing their ability to reason over video content. Existing approaches maintain visual grounding during reasoning in two main ways: they either refer to evidence using textual coordinates, which specify symbolic locations rather than the visual content itself, or reinsert cropped regions or frames into the multimodal context, preserving visual details at the cost of substantial context expansion. To address these limitations, we introduce VideoLVR, which constructs latent visual evidence from local regions at relevant video moments, thereby providing visual support for intermediate reasoning steps. To supervise latent visual evidence generation, we introduce a visual token prediction objective that formulates visual token reconstruction as prediction over a vocabulary derived from the input video, thereby unifying visual evidence reconstruction and text generation within the same token prediction framework. This shared prediction framework enables MLLMs to reason over interleaved text tokens and latent visual states while integrating evidence from different moments. We further extend VideoLVR to reinforcement learning by treating sampled visual tokens as actions alongside text tokens and jointly optimizing the policy using final-answer rewards. By efficiently revisiting task-relevant visual information during reasoning, VideoLVR improves video understanding without substantially expanding the multimodal context. Experiments on multiple video benchmarks demonstrate its effectiveness, especially on tasks requiring fine-grained visual evidence.",
     "url": "https://arxiv.org/abs/2610.37613v1",
     "headline": "Helping AI revisit details in videos",
-    "summary": "An AI watching a video can lose track of what it saw while explaining it. This method lets it revisit useful visual clues; the authors report better answers in tests.",
+    "summary": "An AI answering a video question can lose track of the visual clues. This approach lets it revisit relevant details without repeatedly adding whole frames to its input.",
     "whyItMatters": "Remembering the right visual details can matter when answering questions about video.",
     "tags": [
       "Video",
       "Artificial intelligence"
     ],
     "illustration": {
-      "layout": "pipeline",
+      "layout": "video",
       "labels": [
-        "Video",
-        "Visual details",
-        "Answer"
+        "Revisit the clue"
       ],
       "accent": "pink",
-      "caption": "Relevant visual details support an answer."
+      "caption": "A conceptual video player representing revisiting visual evidence."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23fcf0f5%22%2F%3E%3Cpath%20d%3D%22M163%20190L270%20190%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Cpath%20d%3D%22M371%20190L477%20190%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Ccircle%20cx%3D%22112%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23f1dbe5%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23f1dbe5%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22528%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23f1dbe5%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M100%20178h24v24h-24zM307%20190l13-17%2013%2017-13%2017z%22%20fill%3D%22none%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M515%20190l9%2010%2018-22%22%20fill%3D%22none%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Ctext%20x%3D%22112%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b65880%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EVideo%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b65880%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EVisual%20details%3C%2Ftext%3E%3Ctext%20x%3D%22528%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b65880%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EAnswer%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%23b65880%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "Relevant visual details support an answer.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "However, language-based reasoning traces do not provide a reliable mechanism for models to revisit relevant visual evidence, leading to visual forgetting and impairing their ability to reason over video content.",
+      "By efficiently revisiting task-relevant visual information during reasoning, VideoLVR improves video understanding without substantially expanding the multimodal context."
+    ],
+    "editorialVersion": "eduscroll-editorial-v1"
   },
   {
     "id": "2610.37605v1",
@@ -347,28 +327,27 @@
     "abstract": "For audio-language models, an answer change after a local sound-event edit can reflect a response to the event's class, sensitivity to waveform rewriting, or both. We compare matched same-class and different-class replacements of a queried event. Both use the same interval, level estimate, donor fitting, and crossfade, while the same-class replacement preserves the correct answer. Across 600 synthetic soundscapes and three models from two architecture families, different-class replacements produce 49.7 to 60.9 percentage points more answer changes than same-class replacements. Same-class accuracy remains within 5.2 percentage points of original accuracy. Among trials with correct original and same-class answers, soundscape-weighted selective accuracy for the inserted class is 73.7 to 81.9%, averaging eligible trials within each soundscape and then weighting eligible soundscapes equally. This protocol tests how model answers respond to local changes in event class.",
     "url": "https://arxiv.org/abs/2610.37605v1",
     "headline": "Testing what sound models really hear",
-    "summary": "Did an AI hear a new sound, or just notice an audio edit? Researchers swapped individual sounds to test the difference.",
+    "summary": "Did an AI hear a different sound, or just react to an audio edit? Tests across 600 synthetic soundscapes used same-kind sound swaps as a control to tell the difference.",
     "whyItMatters": "Comparing both replacements helps separate responses to sound type from responses to editing.",
     "tags": [
       "Sound",
       "Artificial intelligence"
     ],
     "illustration": {
-      "layout": "pipeline",
+      "layout": "sound",
       "labels": [
-        "Recording",
-        "Sound swap",
-        "Model answer"
+        "A sound swap",
+        "Control sound"
       ],
       "accent": "blue",
-      "caption": "A sound swap tests how an answer changes."
+      "caption": "A conceptual audio event and a replacement sound."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23eff6fb%22%2F%3E%3Cpath%20d%3D%22M163%20190L270%20190%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Cpath%20d%3D%22M371%20190L477%20190%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Ccircle%20cx%3D%22112%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22528%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M100%20178h24v24h-24zM307%20190l13-17%2013%2017-13%2017z%22%20fill%3D%22none%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M515%20190l9%2010%2018-22%22%20fill%3D%22none%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Ctext%20x%3D%22112%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%233778b2%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3ERecording%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%233778b2%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3ESound%20swap%3C%2Ftext%3E%3Ctext%20x%3D%22528%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%233778b2%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EModel%20answer%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%233778b2%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "A sound swap tests how an answer changes.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "For audio-language models, an answer change after a local sound-event edit can reflect a response to the event's class, sensitivity to waveform rewriting, or both.",
+      "We compare matched same-class and different-class replacements of a queried event.",
+      "Across 600 synthetic soundscapes and three models from two architecture families, different-class replacements produce 49.7 to 60.9 percentage points more answer changes than same-class replacements."
+    ],
+    "editorialVersion": "eduscroll-editorial-v1"
   },
   {
     "id": "2610.37599v1",
@@ -388,28 +367,26 @@
     "abstract": "Developing on-device image models requires considering practical user needs, task types and device resource constraints. However, existing benchmarks provide limited guidance on identifying capability gaps between on-device models and server-side models. We introduce MoI-Bench, a benchmark grounded in mobile user needs, comprising 64 subtasks and 1150 samples. It defines 16 operations, such as removal and replacement, and eight visual target categories covering content such as portraits and text. These form two orthogonal axes whose applicable combinations define specific tasks, such as removing facial makeup. To better guide model improvement, we further propose MoI-Eval, which introduces task-specific criteria covering instruction following, visual quality and detail preservation. We further construct sample-level evaluation questions and aggregate their scores into overall quality and capability profiles along the operation, target and criteria axes. We evaluate representative on-device and server-side models and measure mobile deployment costs. Results show that this decoupled Operation x Target design provides finer-grained guidance for improving compact models. For example, it highlights the need to prioritize specific capability gaps (e.g., text-replacement) over broad application-level goals (e.g., improving text editing). Unlike conventional benchmarks that rank models using a single score, we introduce a two-dimensional Quality-Deployability capability map to assess models for practical mobile use. The map shows that current on-device models can achieve efficient generation or editing but expanding their task coverage deserves greater attention than further improving deployment efficiency. Further progress requires improving editing quality, particularly identity preservation and text rendering, while broadening task coverage.",
     "url": "https://arxiv.org/abs/2610.37599v1",
     "headline": "Phone image tools still miss some tasks",
-    "summary": "Researchers tested what AI image editors can do on a phone, alongside how costly they are to run. The results show gaps that one overall score can hide.",
+    "summary": "A phone’s AI image editor can be quick and still botch a specific task. A benchmark with 1,150 examples across 64 subtasks exposes gaps such as replacing text and preserving identity.",
     "whyItMatters": "A fast image tool may still struggle with the specific edit someone wants.",
     "tags": [
       "Image editing",
       "Mobile devices"
     ],
     "illustration": {
-      "layout": "pipeline",
+      "layout": "device",
       "labels": [
-        "Photo",
-        "Phone edit",
-        "Result"
+        "Phone editing"
       ],
       "accent": "pink",
-      "caption": "An image editing task on a phone."
+      "caption": "A conceptual phone image editor, not a generated result."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23fcf0f5%22%2F%3E%3Cpath%20d%3D%22M163%20190L270%20190%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Cpath%20d%3D%22M371%20190L477%20190%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Ccircle%20cx%3D%22112%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23f1dbe5%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23f1dbe5%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22528%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23f1dbe5%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M100%20178h24v24h-24zM307%20190l13-17%2013%2017-13%2017z%22%20fill%3D%22none%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M515%20190l9%2010%2018-22%22%20fill%3D%22none%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Ctext%20x%3D%22112%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b65880%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EPhoto%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b65880%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EPhone%20edit%3C%2Ftext%3E%3Ctext%20x%3D%22528%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b65880%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EResult%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%23b65880%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "An image editing task on a phone.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "We introduce MoI-Bench, a benchmark grounded in mobile user needs, comprising 64 subtasks and 1150 samples.",
+      "For example, it highlights the need to prioritize specific capability gaps (e.g., text-replacement) over broad application-level goals (e.g., improving text editing).",
+      "Further progress requires improving editing quality, particularly identity preservation and text rendering, while broadening task coverage."
+    ],
+    "editorialVersion": "eduscroll-editorial-v1"
   },
   {
     "id": "2610.37598v1",
@@ -427,28 +404,27 @@
     "abstract": "Traffic forecasting requires modeling complex temporal dynamics and the spatial dependencies imposed by road topology. Supervised graph-based models achieve strong performance, but are often trained for a particular dataset and sensor graph, making deployment to new or evolving networks costly. Prior-Data Fitted Networks (PFNs) offer a zero-shot alternative by learning in-context inference from synthetic task priors, which provide an explicit mechanism for encoding domain-specific assumptions. Existing forecasting PFNs, however, do not explicitly represent the graph-structured dependencies governing traffic dynamics. To combine graph-aware traffic modeling with zero-shot adaptation, we introduce the Graph-Aware Spatiotemporal Prior-Data Fitted Network (GAS-PFN). GAS-PFN incorporates sampled road topology into its synthetic task prior through random-walk diffusion, teaching the model to learn graph-coupled dynamics during pretraining. Its co-designed inference architecture uses two mask-conditioned passes through a shared Transformer backbone to separately model sensor-specific temporal dynamics and spatiotemporal interactions among neighboring sensors before integrating their representations for prediction. This design enables GAS-PFN to use target-network structure and context without parameter updates. Across six benchmarks at the 90-minute horizon, GAS-PFN reduces MSE by 34.0% on average relative to TimePFN, its closest PFN-based predecessor. It also reduces MSE by 27.7% on average relative to four recent industry-developed general-purpose zero-shot forecasters. In this comparison, all models receive 90 minutes of contiguous recent history, and any additional context is drawn from each dataset's chronological training split. These results indicate that aligning PFN priors and inference architectures with graph structure improves in-context learning for zero-shot traffic forecasting.",
     "url": "https://arxiv.org/abs/2610.37598v1",
     "headline": "Road connections help predict traffic flow",
-    "summary": "A traffic model learned from made-up road networks before predicting traffic on real ones. In tests, it made better predictions without being retrained for each network.",
+    "summary": "Forecasting traffic 90 minutes ahead, a model cut average squared prediction error by 34% across six benchmarks versus its closest predecessor. It learned from synthetic road networks without retraining for each real network.",
     "whyItMatters": "Road connections can provide useful context when forecasting traffic on an unfamiliar network.",
     "tags": [
       "Traffic",
       "Forecasting"
     ],
     "illustration": {
-      "layout": "network",
+      "layout": "roads",
       "labels": [
-        "Roads",
-        "Recent traffic",
-        "Forecast"
+        "Connected roads",
+        "Traffic sensors"
       ],
       "accent": "orange",
-      "caption": "Road connections provide context for a traffic forecast."
+      "caption": "Conceptual road connections and sensors used in traffic forecasting."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23fcf5ef%22%2F%3E%3Cpath%20d%3D%22M320%20185L180%20125M180%20125L320%2080%22%20stroke%3D%22%23b96c3c%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L320%2080M320%2080L460%20125%22%20stroke%3D%22%23b96c3c%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L460%20125M460%20125L450%20245%22%20stroke%3D%22%23b96c3c%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L450%20245M450%20245L320%20290%22%20stroke%3D%22%23b96c3c%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L320%20290M320%20290L190%20245%22%20stroke%3D%22%23b96c3c%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L190%20245M190%20245L180%20125%22%20stroke%3D%22%23b96c3c%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%22180%22%20cy%3D%22125%22%20r%3D%2223%22%20fill%3D%22%23f4dfcd%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%2280%22%20r%3D%2223%22%20fill%3D%22%23f4dfcd%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22460%22%20cy%3D%22125%22%20r%3D%2223%22%20fill%3D%22%23f4dfcd%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22450%22%20cy%3D%22245%22%20r%3D%2223%22%20fill%3D%22%23f4dfcd%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22290%22%20r%3D%2223%22%20fill%3D%22%23f4dfcd%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22190%22%20cy%3D%22245%22%20r%3D%2223%22%20fill%3D%22%23f4dfcd%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22185%22%20r%3D%2242%22%20fill%3D%22%23f4dfcd%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22185%22%20r%3D%2212%22%20fill%3D%22%23b96c3c%22%2F%3E%3Ctext%20x%3D%22160%22%20y%3D%22335%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b96c3c%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3ERoads%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22365%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b96c3c%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3ERecent%20traffic%3C%2Ftext%3E%3Ctext%20x%3D%22480%22%20y%3D%22335%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b96c3c%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EForecast%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%23b96c3c%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "Road connections provide context for a traffic forecast.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "GAS-PFN incorporates sampled road topology into its synthetic task prior through random-walk diffusion, teaching the model to learn graph-coupled dynamics during pretraining.",
+      "This design enables GAS-PFN to use target-network structure and context without parameter updates.",
+      "Across six benchmarks at the 90-minute horizon, GAS-PFN reduces MSE by 34.0% on average relative to TimePFN, its closest PFN-based predecessor."
+    ],
+    "editorialVersion": "eduscroll-editorial-v1"
   },
   {
     "id": "2610.37588v1",
@@ -462,28 +438,26 @@
     "abstract": "World models are widely proposed as core components for enabling agents to reason over long temporal and spatial horizons. Yet current evaluations often emphasize task performance while providing limited insight into whether learned world models acquire predictive latent dynamics that reflect the underlying structure of the environment. Here we introduce the concept of faithful latent world models as an equivariance condition between the environment's transition map and the learned latent dynamics. We propose latent rollout consistency (LRC) as a metric to evaluate action-conditioned latent prediction. Strikingly, we find that across the studied state of the art latent world models, none solves the task by actually faithfully modeling the dynamics of the environment.",
     "url": "https://arxiv.org/abs/2610.37588v1",
     "headline": "Good task scores can hide flawed predictions",
-    "summary": "An AI can do well on a task without learning how its world changes. This study proposes a test for that deeper understanding; the models examined did not meet it.",
+    "summary": "Winning a task doesn’t show that an AI understands how its world changes. None of the world models tested met this paper’s stronger standard for predicting those changes.",
     "whyItMatters": "Doing well on a task does not necessarily mean a model understands how its environment changes.",
     "tags": [
       "Artificial intelligence",
       "Prediction"
     ],
     "illustration": {
-      "layout": "pipeline",
+      "layout": "layers",
       "labels": [
-        "Environment",
-        "Model forecast",
-        "Next state"
+        "World model"
       ],
       "accent": "purple",
-      "caption": "A model predicts how an environment changes."
+      "caption": "Conceptual model layers, not evidence of physical understanding."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23f5f1fb%22%2F%3E%3Cpath%20d%3D%22M163%20190L270%20190%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Cpath%20d%3D%22M371%20190L477%20190%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Ccircle%20cx%3D%22112%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23e6ddf7%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23e6ddf7%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22528%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23e6ddf7%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M100%20178h24v24h-24zM307%20190l13-17%2013%2017-13%2017z%22%20fill%3D%22none%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M515%20190l9%2010%2018-22%22%20fill%3D%22none%22%20stroke%3D%22%237354c8%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Ctext%20x%3D%22112%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%237354c8%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EEnvironment%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%237354c8%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EModel%20forecast%3C%2Ftext%3E%3Ctext%20x%3D%22528%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%237354c8%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3ENext%20state%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%237354c8%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "A model predicts how an environment changes.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "Yet current evaluations often emphasize task performance while providing limited insight into whether learned world models acquire predictive latent dynamics that reflect the underlying structure of the environment.",
+      "Strikingly, we find that across the studied state of the art latent world models, none solves the task by actually faithfully modeling the dynamics of the environment."
+    ],
+    "editorialVersion": "eduscroll-editorial-v1",
+    "visualPreference": "none"
   },
   {
     "id": "2610.37585v1",
@@ -851,28 +825,27 @@
     "abstract": "We introduce Timestral, a family of four time series foundation models for probabilistic forecasting, with 5M, 28M, 123M, and 209M parameters. Timestral sets a new state of the art on GIFT-Eval, TIME, and fev-bench, where Timestral-209M and Timestral-123M take the top two places on every metric. We achieve this with three ingredients: Decoupled Horizon Forecasting (DHF), which separates prediction tokens from the causally encoded context, so that longer horizons are trained without masking context and each observed value is both a forecast target and context for later forecasts; a covariate framework that natively supports known-future covariates within a causal architecture; and a two-stage pipeline that pretrains exclusively on a diverse, large-scale synthetic corpus before post-training on a mix of real and synthetic data with extended context. This report describes the model design and its benchmark results. Weights for all four models are available on Hugging Face and inference code on GitHub.",
     "url": "https://arxiv.org/abs/2610.37585v1",
     "headline": "Models learn forecasting from simulated data",
-    "summary": "A new family of AI models predicts how measurements change over time. The authors report strong test results and released four sizes for others to use.",
+    "summary": "Four open forecasting models range from 5 million to 209 million parameters. The two largest topped every reported metric on three test suites.",
     "whyItMatters": "Simulated data can form part of training for models that predict changing values.",
     "tags": [
       "Forecasting",
       "Artificial intelligence"
     ],
     "illustration": {
-      "layout": "pipeline",
+      "layout": "layers",
       "labels": [
-        "Simulated data",
-        "Mixed training",
-        "Forecast"
+        "Four model sizes"
       ],
       "accent": "green",
-      "caption": "Simulated and real data support forecast training."
+      "caption": "Conceptual model layers, not a plot of benchmark performance."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23eff7f2%22%2F%3E%3Cpath%20d%3D%22M163%20190L270%20190%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Cpath%20d%3D%22M371%20190L477%20190%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Ccircle%20cx%3D%22112%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d6ebe0%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d6ebe0%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22528%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d6ebe0%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M100%20178h24v24h-24zM307%20190l13-17%2013%2017-13%2017z%22%20fill%3D%22none%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M515%20190l9%2010%2018-22%22%20fill%3D%22none%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Ctext%20x%3D%22112%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%2341856a%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3ESimulated%20data%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%2341856a%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EMixed%20training%3C%2Ftext%3E%3Ctext%20x%3D%22528%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%2341856a%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EForecast%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%2341856a%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "Simulated and real data support forecast training.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "We introduce Timestral, a family of four time series foundation models for probabilistic forecasting, with 5M, 28M, 123M, and 209M parameters.",
+      "Timestral sets a new state of the art on GIFT-Eval, TIME, and fev-bench, where Timestral-209M and Timestral-123M take the top two places on every metric.",
+      "Weights for all four models are available on Hugging Face and inference code on GitHub."
+    ],
+    "editorialVersion": "eduscroll-editorial-v1",
+    "visualPreference": "none"
   },
   {
     "id": "2610.37584v1",
@@ -892,7 +865,7 @@
     "abstract": "Personalized recommendation depends on learning semantic and collaborative relations among items from online content and user interactions. Generative recommendation (GR) offers a promising paradigm by autoregressively generating discrete semantic IDs (SIDs) of items. However, randomly initialized SID token embeddings and GR models trained from scratch do not directly inherit the semantic relations inherent in items, while inter-item collaborative relations are learned largely implicitly through token-level attention and next-token supervision. To address this limitation, we propose REGER, a unified framework that explicitly incorporates inter-item relations into semantic pretraining, history encoding, and SID generation. We pretrain the GR model through generative semantic retrieval, enabling it to inherit inter-item semantic similarity by learning to generate semantic neighbors' SIDs. We combine global attention with local attention aligned with SID boundaries to capture historical context and directed transitions between adjacent items. We further develop a theoretical framework for hierarchical preference decomposition over the SID prefix tree, proving an exact factorization of collaborative preference distributions and a weighted decomposition of item-level KL divergence into prefix-conditional KL divergences. Building on this analysis, we distill a discriminative teacher's full conditional distributions over all legal next tokens at ground-truth prefixes along the target SID path, jointly optimizing this objective with cross-entropy. Extensive experiments on real-world datasets demonstrate consistent improvements over existing GR baselines and support the effectiveness of the proposed preference distillation.",
     "url": "https://arxiv.org/abs/2610.37584v1",
     "headline": "Better recommendations through links between items",
-    "summary": "A recommender can learn from both what items mean and how people use them. This paper builds those connections into a new way of suggesting what to try next.",
+    "summary": "A recommender learns which items are similar before learning what to suggest next. On the tested datasets, explicitly modelling those links improved recommendations over existing systems of the same kind.",
     "whyItMatters": "Connections between items can help a system learn what to suggest next.",
     "tags": [
       "Recommendations",
@@ -901,19 +874,16 @@
     "illustration": {
       "layout": "network",
       "labels": [
-        "Viewed item",
-        "Related item",
-        "Suggestion"
+        "Related items"
       ],
       "accent": "pink",
-      "caption": "Connections between items inform a suggestion."
+      "caption": "Conceptual relationships between items in a recommendation system."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23fcf0f5%22%2F%3E%3Cpath%20d%3D%22M320%20185L180%20125M180%20125L320%2080%22%20stroke%3D%22%23b65880%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L320%2080M320%2080L460%20125%22%20stroke%3D%22%23b65880%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L460%20125M460%20125L450%20245%22%20stroke%3D%22%23b65880%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L450%20245M450%20245L320%20290%22%20stroke%3D%22%23b65880%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L320%20290M320%20290L190%20245%22%20stroke%3D%22%23b65880%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L190%20245M190%20245L180%20125%22%20stroke%3D%22%23b65880%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%22180%22%20cy%3D%22125%22%20r%3D%2223%22%20fill%3D%22%23f1dbe5%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%2280%22%20r%3D%2223%22%20fill%3D%22%23f1dbe5%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22460%22%20cy%3D%22125%22%20r%3D%2223%22%20fill%3D%22%23f1dbe5%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22450%22%20cy%3D%22245%22%20r%3D%2223%22%20fill%3D%22%23f1dbe5%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22290%22%20r%3D%2223%22%20fill%3D%22%23f1dbe5%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22190%22%20cy%3D%22245%22%20r%3D%2223%22%20fill%3D%22%23f1dbe5%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22185%22%20r%3D%2242%22%20fill%3D%22%23f1dbe5%22%20stroke%3D%22%23b65880%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22185%22%20r%3D%2212%22%20fill%3D%22%23b65880%22%2F%3E%3Ctext%20x%3D%22160%22%20y%3D%22335%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b65880%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EViewed%20item%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22365%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b65880%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3ERelated%20item%3C%2Ftext%3E%3Ctext%20x%3D%22480%22%20y%3D%22335%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b65880%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3ESuggestion%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%23b65880%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "Connections between items inform a suggestion.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "We pretrain the GR model through generative semantic retrieval, enabling it to inherit inter-item semantic similarity by learning to generate semantic neighbors' SIDs.",
+      "Extensive experiments on real-world datasets demonstrate consistent improvements over existing GR baselines and support the effectiveness of the proposed preference distillation."
+    ],
+    "editorialVersion": "eduscroll-editorial-v1"
   },
   {
     "id": "2610.37571v1",
@@ -932,28 +902,24 @@
     "abstract": "Many real-world decisions require teams to integrate information distributed across participants. Yet AI agents are still primarily trained and benchmarked in isolation. We introduce TeamGym, an environment for evaluating and training language model-based agents on team decision-making problems constructed from real-world legal, finance, medical, and software engineering corpora. TeamGym introduces a method to identify a minimal set of facts, each element of which is necessary and all of which are collectively sufficient for a correct final decision, which we call pivotal information. This enables TeamGym to both control the distribution of pivotal information and track how well agents identify and integrate pivotal information when making team decisions. Examining 8 language models on 12 source corpora, we find that current AI agents often fail to effectively share information: Distributing pivotal information across participants lowers success rate by 22.9 percentage points on average relative to giving the same information to a single model (a communication gap). We also document that participants do not effectively retrieve decision-relevant information on their own: A team's success rate is lowered by a further 19.9 points when participants must identify and extract pivotal information from source material rather than receiving it directly (a retrieval gap). To help remedy these deficits, we use TeamGym to train policies through reinforcement learning on team decision loss. Across two policy-training experiments, we find that training improves final-decision quality and induces emergent coordination in participation, speaker selection, and communication, even though the reward evaluates only the final decision.",
     "url": "https://arxiv.org/abs/2610.37571v1",
     "headline": "AI teams struggle to share key facts",
-    "summary": "More AI agents don't always make a better team. In these tests, splitting key facts between agents led to worse decisions than giving one model all the information.",
+    "summary": "Splitting key facts across an AI team cut decision success by 22.9 percentage points on average, versus giving one model all the facts. The study tested eight models using 12 source collections.",
     "whyItMatters": "Teamwork requires both finding important information and sharing it effectively.",
     "tags": [
       "Artificial intelligence",
       "Teamwork"
     ],
     "illustration": {
-      "layout": "network",
+      "layout": "documents",
       "labels": [
-        "Participant",
-        "Participant",
-        "Decision"
+        "Team facts"
       ],
       "accent": "blue",
-      "caption": "Participants share information for a decision."
+      "caption": "Conceptual documents representing facts distributed across a team."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23eff6fb%22%2F%3E%3Cpath%20d%3D%22M320%20185L180%20125M180%20125L320%2080%22%20stroke%3D%22%233778b2%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L320%2080M320%2080L460%20125%22%20stroke%3D%22%233778b2%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L460%20125M460%20125L450%20245%22%20stroke%3D%22%233778b2%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L450%20245M450%20245L320%20290%22%20stroke%3D%22%233778b2%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L320%20290M320%20290L190%20245%22%20stroke%3D%22%233778b2%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M320%20185L190%20245M190%20245L180%20125%22%20stroke%3D%22%233778b2%22%20opacity%3D%22.35%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%22180%22%20cy%3D%22125%22%20r%3D%2223%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%2280%22%20r%3D%2223%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22460%22%20cy%3D%22125%22%20r%3D%2223%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22450%22%20cy%3D%22245%22%20r%3D%2223%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22290%22%20r%3D%2223%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22190%22%20cy%3D%22245%22%20r%3D%2223%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22185%22%20r%3D%2242%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22185%22%20r%3D%2212%22%20fill%3D%22%233778b2%22%2F%3E%3Ctext%20x%3D%22160%22%20y%3D%22335%22%20text-anchor%3D%22middle%22%20fill%3D%22%233778b2%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EParticipant%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22365%22%20text-anchor%3D%22middle%22%20fill%3D%22%233778b2%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EParticipant%3C%2Ftext%3E%3Ctext%20x%3D%22480%22%20y%3D%22335%22%20text-anchor%3D%22middle%22%20fill%3D%22%233778b2%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EDecision%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%233778b2%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "Participants share information for a decision.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "Examining 8 language models on 12 source corpora, we find that current AI agents often fail to effectively share information: Distributing pivotal information across participants lowers success rate by 22.9 percentage points on average relative to giving the same information to a single model (a communication gap)."
+    ],
+    "editorialVersion": "eduscroll-editorial-v1"
   },
   {
     "id": "2610.37567v1",
@@ -967,28 +933,31 @@
     "abstract": "AI agents have made substantial progress in domains where they have a non-trivial amount of time to deliberate between actions, such as mathematics, software engineering, and performing tasks on desktop applications. It is less clear how such models fare in settings that demand real-time interaction, such as playing a video game or operating a physical device. In these settings, the environment state may evolve as the agent is reasoning, or even as the underlying model is performing a forward pass. To gain insight into the real-time interaction capabilities of vision-language agents, we introduce Gym-Anything-RT. Our key idea is to construct visual minigames that demand a portfolio of capabilities required for interactive real-time settings. Gym-Anything-RT uses an agentic pipeline to automatically generate such environments based on a taxonomy of six capabilities required for real-time interaction, including the ability to perceive the environment and act under an evolving environment state. A key feature of Gym-Anything-RT is that it allows for controlled comparison of real-time interaction capabilities: we can run the same minigame in real time, or pause or slow down the environment to relax the requirement for real-time actions. We use Gym-Anything-RT to construct 100 real-time minigames and evaluate AI agents on them. We find large capability gaps in real-time interaction. For example, GPT-6 Astra (xHigh) achieves a pass rate of only 9.0% on the real-time minigames, which rises to 75.0% when the environment is paused. We also identify intriguing behaviors by the most powerful frontier agents: for instance, when given the ability to write code, these agents write code that bypasses the need to perceive and act in real time. We publicly release Gym-Anything-RT and the generated minigames to spur further research on AI agents in real-time interactive settings.",
     "url": "https://arxiv.org/abs/2610.37567v1",
     "headline": "AI agents struggle when games keep moving",
-    "summary": "AI struggles when the world won't wait for it to think. In these game tests, agents did much better when the action paused while they chose their next move.",
+    "summary": "For GPT-6 Astra, pass rate jumped from 9% to 75% when 100 minigames paused while it reasoned. The same agent struggled when the game kept moving.",
     "whyItMatters": "Acting while a situation changes is different from acting when there is time to pause.",
     "tags": [
       "Artificial intelligence",
       "Games"
     ],
     "illustration": {
-      "layout": "pipeline",
+      "layout": "device",
       "labels": [
-        "Moving game",
-        "Agent observes",
-        "Agent acts"
+        "Moving game"
       ],
       "accent": "orange",
-      "caption": "An agent acts while a game keeps moving."
+      "caption": "A conceptual interactive game, not a model result."
     },
     "figure": {
       "url": "https://arxiv.org/html/2610.37567v1/figures/rotating_keyboard_before.png",
       "caption": "One game asks an agent to enter a code using moving keys.",
       "kind": "paper",
       "readable": true
-    }
+    },
+    "evidence": [
+      "We use Gym-Anything-RT to construct 100 real-time minigames and evaluate AI agents on them.",
+      "For example, GPT-6 Astra (xHigh) achieves a pass rate of only 9.0% on the real-time minigames, which rises to 75.0% when the environment is paused."
+    ],
+    "editorialVersion": "eduscroll-editorial-v1"
   },
   {
     "id": "2610.37561v1",
@@ -1007,28 +976,27 @@
     "abstract": "Background. Selective prediction systems improve the safety of clinical artificial intelligence by deferring ambiguous cases to human experts while automating high-confidence decisions. However, this safety mechanism relies entirely on the premise that uncertainty scores accurately reflect clinical ambiguity. In prognostic tasks characterized by severe class imbalance, where the clinical outcome of interest is a minority, this assumption breaks down. Standard uncertainty measures cease to capture clinically aligned ambiguity; instead, they become a proxy for class membership, systematically penalizing minority patients regardless of their individual predictive clarity. Results. Across 56 synthetic conditions and three neurodegenerative cohorts spanning severe class imbalance to near-balanced conditions (multiple sclerosis, Parkinson's Disease, Alzheimer's Disease), our framework consistently maintained bounded, balanced risk across trajectories. In contrast, global metrics either collapsed minority Sensitivity or protected the minority at the expense of majority patients. Applying CCR with standard entropy fails to protect the minority because it breaks within-class monotonicity when tau=0.5. Combining CCR with threshold-aware metrics restores strict monotonicity, correctly identifies ambiguous patients, and safely mitigates minority exclusion. Conclusions. Under clinical class imbalance, standard uncertainty quantification measures dataset sparsity rather than clinical ambiguity, creating a systemic illusion of safety. This bias is a correctable structural flaw. Clinical pipelines deploying selective prediction under imbalance should adopt threshold-aligned uncertainty measures and class-stratified evaluation. This reduces class-specific risk imbalance, supporting safer selective prediction under the evaluated conditions without silently excluding the most vulnerable patients.",
     "url": "https://arxiv.org/abs/2610.37561v1",
     "headline": "Uncertainty scores can overlook minority patients",
-    "summary": "An AI's confidence score can be misleading when some medical outcomes are rare. This study tests ways to help the system flag uncertain cases more fairly.",
+    "summary": "A medical AI can mistake a rare outcome for an uncertain prediction. Tests across 56 synthetic conditions and three patient cohorts showed why one overall safety score can hide who gets excluded.",
     "whyItMatters": "Uncertainty measures affect which cases an automated system passes to human experts.",
     "tags": [
       "Health",
       "Artificial intelligence"
     ],
     "illustration": {
-      "layout": "pipeline",
+      "layout": "documents",
       "labels": [
-        "Prediction",
-        "Uncertainty",
-        "Human review"
+        "Case review"
       ],
       "accent": "blue",
-      "caption": "Uncertainty helps determine which predictions need review."
+      "caption": "Conceptual case records, not patient data or a clinical result."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23eff6fb%22%2F%3E%3Cpath%20d%3D%22M163%20190L270%20190%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Cpath%20d%3D%22M371%20190L477%20190%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Ccircle%20cx%3D%22112%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22528%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d8eaf8%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M100%20178h24v24h-24zM307%20190l13-17%2013%2017-13%2017z%22%20fill%3D%22none%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M515%20190l9%2010%2018-22%22%20fill%3D%22none%22%20stroke%3D%22%233778b2%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Ctext%20x%3D%22112%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%233778b2%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EPrediction%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%233778b2%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EUncertainty%3C%2Ftext%3E%3Ctext%20x%3D%22528%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%233778b2%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EHuman%20review%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%233778b2%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "Uncertainty helps determine which predictions need review.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "Standard uncertainty measures cease to capture clinically aligned ambiguity; instead, they become a proxy for class membership, systematically penalizing minority patients regardless of their individual predictive clarity.",
+      "Across 56 synthetic conditions and three neurodegenerative cohorts spanning severe class imbalance to near-balanced conditions (multiple sclerosis, Parkinson's Disease, Alzheimer's Disease), our framework consistently maintained bounded, balanced risk across trajectories.",
+      "In contrast, global metrics either collapsed minority Sensitivity or protected the minority at the expense of majority patients."
+    ],
+    "editorialVersion": "eduscroll-editorial-v1",
+    "visualPreference": "none"
   },
   {
     "id": "2610.37550v1",
@@ -1043,27 +1011,24 @@
     "abstract": "Manipulation policies are evaluated predominantly by binary task success, which cannot tell whether the commanded gesture is the one the object's kinematics admit. We introduce Constraint-Referenced Strategy (CRS), which projects the commanded end-effector twist onto the object's joint axis, separating progress along the joint from off-constraint waste. CRS requires a joint model and a joint-following scripted controller derived from it, but no recorded demonstration or learned judge. On 74 simulated articulated objects, success registers three transfer failures as lower rates but attributes none, while the two CRS channels give each a distinct signature. A door-trained behavior-cloning policy opens drawers in 59 of 110 episodes, and in these passes it commands about $40\\times$ the off-axis rotation of a drawer-trained policy's passes ($1.27$ vs.\\ $0.032$~rad/s). Relative to a scripted controller scored with the same axis, CRS verdicts are unchanged under joint-axis errors up to $30^\\circ$; absolute thresholds tolerate about $8^\\circ$.",
     "url": "https://arxiv.org/abs/2610.37550v1",
     "headline": "Opening a drawer is not the whole story",
-    "summary": "A robot can open a drawer and still use the wrong motion. Measuring its motion in simulations revealed problems that a pass-or-fail score missed.",
+    "summary": "A door-trained robot opened drawers in 59 of 110 simulated attempts. Even its successes involved about 40 times as much off-axis rotation as a drawer-trained robot’s successes.",
     "whyItMatters": "Success alone can miss differences in how a robot performs a task.",
     "tags": [
       "Robotics"
     ],
     "illustration": {
-      "layout": "pipeline",
+      "layout": "motion",
       "labels": [
-        "Robot motion",
-        "Drawer axis",
-        "Motion check"
+        "A drawer’s axis"
       ],
       "accent": "orange",
-      "caption": "A motion check compares robot movement with the drawer axis."
+      "caption": "A conceptual drawer and its movement axis."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23fcf5ef%22%2F%3E%3Cpath%20d%3D%22M163%20190L270%20190%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Cpath%20d%3D%22M371%20190L477%20190%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Ccircle%20cx%3D%22112%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23f4dfcd%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23f4dfcd%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22528%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23f4dfcd%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M100%20178h24v24h-24zM307%20190l13-17%2013%2017-13%2017z%22%20fill%3D%22none%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M515%20190l9%2010%2018-22%22%20fill%3D%22none%22%20stroke%3D%22%23b96c3c%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Ctext%20x%3D%22112%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b96c3c%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3ERobot%20motion%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b96c3c%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EDrawer%20axis%3C%2Ftext%3E%3Ctext%20x%3D%22528%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b96c3c%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EMotion%20check%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%23b96c3c%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "A motion check compares robot movement with the drawer axis.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "On 74 simulated articulated objects, success registers three transfer failures as lower rates but attributes none, while the two CRS channels give each a distinct signature.",
+      "A door-trained behavior-cloning policy opens drawers in 59 of 110 episodes, and in these passes it commands about $40\\times$ the off-axis rotation of a drawer-trained policy's passes"
+    ],
+    "editorialVersion": "eduscroll-editorial-v1"
   },
   {
     "id": "2610.37547v1",
@@ -1079,27 +1044,24 @@
     "abstract": "Imitation policies that reliably execute most of a manipulation trajectory can still fail in localized regions requiring last-mile precision. Updating the full policy or exploring residual actions everywhere treats this local failure as a global learning problem. We introduce Adaptive Residual Correction (ARC), a lightweight post-training module that uses reinforcement learning (RL) to learn a residual correction on top of a frozen policy while using sparse human corrections to structure autonomous exploration. Rather than treating human corrections as imitation targets, ARC uses pre-intervention states to determine 'when' residual control should become active and correction geometry to determine 'where' in residual action space autonomous refinement should explore; task reward determines 'what' residual is ultimately executed. Across three precision-manipulation tasks on a real robot, ARC improves average task success from 33.3% to 75.0%. The human corrections define task-dependent 2-3 dimensional subspaces of the seven-joint residual space that retain 96.0-97.7% of squared correction magnitude. Together, these results show that sparse human corrections can localize and constrain autonomous post-training without requiring the observed correction itself to serve as the final action target.",
     "url": "https://arxiv.org/abs/2610.37547v1",
     "headline": "Small human corrections help robots improve",
-    "summary": "Small human corrections helped robots improve the tricky parts of a task. Across three real-robot tasks, success improved without changing the whole original model.",
+    "summary": "A few human corrections helped a robot practise the hardest parts of a task. Across three real-robot tasks, average success rose from 33.3% to 75% without retraining its original policy.",
     "whyItMatters": "A robot may improve a difficult part of a task without relearning the whole task.",
     "tags": [
       "Robotics",
       "Learning"
     ],
     "illustration": {
-      "layout": "pipeline",
+      "layout": "robot",
       "labels": [
-        "Human help",
-        "Robot practice",
-        "Adjusted action"
+        "Robot practice"
       ],
       "accent": "green",
-      "caption": "Human corrections guide the robot's practice."
+      "caption": "A conceptual robot arm representing targeted movement practice."
     },
-    "figure": {
-      "url": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20420%22%3E%3Cdefs%3E%3Cmarker%20id%3D%22arrow%22%20markerWidth%3D%228%22%20markerHeight%3D%228%22%20refX%3D%226%22%20refY%3D%224%22%20orient%3D%22auto%22%3E%3Cpath%20d%3D%22M0%201L6%204L0%207%22%20fill%3D%22none%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fmarker%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22420%22%20rx%3D%2220%22%20fill%3D%22%23eff7f2%22%2F%3E%3Cpath%20d%3D%22M163%20190L270%20190%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Cpath%20d%3D%22M371%20190L477%20190%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20marker-end%3D%22url(%23arrow)%22%2F%3E%3Ccircle%20cx%3D%22112%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d6ebe0%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d6ebe0%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22528%22%20cy%3D%22190%22%20r%3D%2242%22%20fill%3D%22%23d6ebe0%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M100%20178h24v24h-24zM307%20190l13-17%2013%2017-13%2017z%22%20fill%3D%22none%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M515%20190l9%2010%2018-22%22%20fill%3D%22none%22%20stroke%3D%22%2341856a%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Ctext%20x%3D%22112%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%2341856a%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EHuman%20help%3C%2Ftext%3E%3Ctext%20x%3D%22320%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%2341856a%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3ERobot%20practice%3C%2Ftext%3E%3Ctext%20x%3D%22528%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20fill%3D%22%2341856a%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2226%22%20font-weight%3D%22500%22%3EAdjusted%20action%3C%2Ftext%3E%3Ctext%20x%3D%2230%22%20y%3D%2235%22%20fill%3D%22%2341856a%22%20opacity%3D%22.6%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3ECONCEPT%20ILLUSTRATION%3C%2Ftext%3E%3C%2Fsvg%3E",
-      "caption": "Human corrections guide the robot's practice.",
-      "kind": "illustration",
-      "readable": true
-    }
+    "evidence": [
+      "We introduce Adaptive Residual Correction (ARC), a lightweight post-training module that uses reinforcement learning (RL) to learn a residual correction on top of a frozen policy while using sparse human corrections to structure autonomous exploration.",
+      "Across three precision-manipulation tasks on a real robot, ARC improves average task success from 33.3% to 75.0%."
+    ],
+    "editorialVersion": "eduscroll-editorial-v1"
   }
 ]
