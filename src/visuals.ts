@@ -1,58 +1,68 @@
-import type { Paper } from './types';
+import type {Paper} from './types';
 
+export const illustrationLayouts=['pipeline','network','layers','comparison','orbit','hexagons','robot','sound','roads','video','device','documents','motion'] as const;
 export interface IllustrationSpec {
-  layout: 'pipeline' | 'network' | 'layers' | 'comparison' | 'orbit';
-  labels: string[];
-  accent: 'purple' | 'blue' | 'green' | 'orange' | 'pink';
-  caption: string;
+  layout:typeof illustrationLayouts[number];
+  labels:string[];
+  accent:'purple'|'blue'|'green'|'orange'|'pink';
+  caption:string;
 }
-const palettes = {
-  purple: ['#7354c8', '#e6ddf7', '#f5f1fb'],
-  blue: ['#3778b2', '#d8eaf8', '#eff6fb'],
-  green: ['#41856a', '#d6ebe0', '#eff7f2'],
-  orange: ['#b96c3c', '#f4dfcd', '#fcf5ef'],
-  pink: ['#b65880', '#f1dbe5', '#fcf0f5'],
+const palettes={
+  purple:['#7354c8','#e6ddf7','#f5f1fb'], blue:['#3778b2','#d8eaf8','#eff6fb'],
+  green:['#41856a','#d6ebe0','#eff7f2'], orange:['#b96c3c','#f4dfcd','#fcf5ef'],
+  pink:['#b65880','#f1dbe5','#fcf0f5'],
 };
-function escapeXml(s: string) { return s.replace(/[<>&"']/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[c]!); }
-export function illustrationFigure(spec: IllustrationSpec): NonNullable<Paper['figure']> {
-  const [ink, fill, bg] = palettes[spec.accent] ?? palettes.purple;
-  const labels = Array.from({length:3}, (_,i) => escapeXml((spec.labels[i] ?? 'Research').slice(0,16)));
-  const text = (x:number,y:number,label:string,size=26) => `<text x="${x}" y="${y}" text-anchor="middle" fill="${ink}" font-family="Arial,Helvetica,sans-serif" font-size="${size}" font-weight="500">${label}</text>`;
-  const node = (x:number,y:number,r=42) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${ink}" stroke-width="2.5"/>`;
-  const arrow = (x1:number,y1:number,x2:number,y2:number) => `<path d="M${x1} ${y1}L${x2} ${y2}" stroke="${ink}" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>`;
+function escapeXml(s:string){return s.replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&apos;'}[c]!));}
+export function illustrationFigure(spec:IllustrationSpec):NonNullable<Paper['figure']>{
+  const [ink,fill,bg]=palettes[spec.accent]??palettes.purple;
+  const labels=spec.labels.slice(0,3).map(s=>escapeXml(s.slice(0,16)));
+  const text=(x:number,y:number,i:number,size=25)=>labels[i]?`<text x="${x}" y="${y}" text-anchor="middle" fill="${ink}" font-family="Arial,Helvetica,sans-serif" font-size="${size}" font-weight="500">${labels[i]}</text>`:'';
+  const node=(x:number,y:number,r=32)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${ink}" stroke-width="3"/>`;
+  const path=(d:string,width=4,opacity=1)=>`<path d="${d}" stroke="${ink}" stroke-width="${width}" opacity="${opacity}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const arrow=(x1:number,y1:number,x2:number,y2:number)=>`<path d="M${x1} ${y1}L${x2} ${y2}" stroke="${ink}" stroke-width="3" fill="none" marker-end="url(#arrow)"/>`;
   let art='';
   switch(spec.layout){
-    case 'network': {
-      const pts=[[180,125],[320,80],[460,125],[450,245],[320,290],[190,245]];
-      art=pts.map(([x,y],i)=>`<path d="M320 185L${x} ${y}M${x} ${y}L${pts[(i+1)%6][0]} ${pts[(i+1)%6][1]}" stroke="${ink}" opacity=".35" stroke-width="2"/>`).join('');
-      art+=pts.map(([x,y])=>node(x,y,23)).join('')+node(320,185,42)+`<circle cx="320" cy="185" r="12" fill="${ink}"/>`;
-      art+=text(160,335,labels[0],26)+text(320,365,labels[1],26)+text(480,335,labels[2],26);break;
+    case 'hexagons':{
+      const hex=(x:number,y:number)=>`<path d="M${x} ${y-48}l42 24v48l-42 24-42-24v-48Z" fill="${fill}" stroke="${ink}" stroke-width="3"/>`;
+      art=[[235,143],[319,143],[403,143],[193,215],[277,215],[361,215],[445,215]].map(([x,y])=>hex(x,y)).join('');
+      art+=text(320,337,0)+text(320,374,1,21);break;
+    }
+    case 'robot':
+      art=`<rect x="140" y="276" width="195" height="20" rx="10" fill="${fill}"/>`+path('M168 276l42-99 94-47 89 65 47 5',20)+node(210,177,23)+node(304,130,23)+node(393,195,19)+path('M441 183v46m0-23h29m0-18v35',5)+`<rect x="478" y="240" width="39" height="40" rx="6" fill="${fill}" stroke="${ink}" stroke-width="3"/>`+path('M111 300h425',3,.5)+text(320,357,0)+text(320,389,1,20);break;
+    case 'sound':
+      art=`<rect x="102" y="104" width="436" height="188" rx="32" fill="${fill}"/>`+path('M150 175h33l48-38v121l-48-38h-33Z',4)+path('M265 166q45 34 0 68m22-90q75 56 0 112',5)+`<rect x="354" y="141" width="139" height="112" rx="20" fill="${bg}" stroke="${ink}" stroke-width="3"/>`+path('M393 166v49q-17-9-22 5t18 10q10-4 10-18v-31l50-12v38q-20-7-23 8t21 6q9-6 9-19v-45Z',3)+text(320,350,0)+text(320,383,1,20);break;
+    case 'roads':
+      art=path('M105 97l430 211M105 308L535 96M320 74v247',26,.18)+path('M105 97l430 211M105 308L535 96M320 74v247',3,.65)+[[202,145],[425,150],[214,254],[320,198],[320,91],[429,256]].map(([x,y])=>node(x,y,13)).join('')+text(320,358,0)+text(320,391,1,20);break;
+    case 'video':
+      art=`<rect x="111" y="83" width="418" height="238" rx="24" fill="${fill}" stroke="${ink}" stroke-width="3"/><rect x="136" y="109" width="368" height="158" rx="10" fill="${bg}"/>`+path('M170 230l73-63 53 41 80-77 93 99',4,.55)+`<path d="M292 150l62 37-62 37Z" fill="${ink}"/><rect x="137" y="285" width="234" height="7" rx="3" fill="${ink}" opacity=".4"/>`+node(371,288,9)+text(320,365,0);break;
+    case 'device':
+      art=`<rect x="232" y="64" width="176" height="260" rx="28" fill="${fill}" stroke="${ink}" stroke-width="4"/><rect x="248" y="96" width="144" height="185" rx="10" fill="${bg}"/><rect x="290" y="78" width="60" height="5" rx="3" fill="${ink}" opacity=".5"/><circle cx="320" cy="301" r="8" fill="${ink}" opacity=".5"/>`+path('M264 253l39-63 24 28 25-47 24 82Z',3)+node(281,132,12)+text(320,366,0);break;
+    case 'documents':
+      art=[[-104,-18,0],[0,17,1],[104,-18,2]].map(([dx,dy,i])=>`<g transform="translate(${dx} ${dy})"><rect x="249" y="92" width="142" height="188" rx="15" fill="${i===1?bg:fill}" stroke="${ink}" stroke-width="3"/>${path('M273 132h94M273 158h74M273 184h88M273 210h55',4,.5)}</g>`).join('')+text(320,361,0)+text(320,391,1,20);break;
+    case 'motion':
+      art=`<path d="M153 113l266-27 71 63-264 31Z" fill="${fill}" stroke="${ink}" stroke-width="3"/><path d="M153 113v144l73 62V180m0 139 264-33V149" fill="${bg}" stroke="${ink}" stroke-width="3"/><path d="M226 180l264-31v137l-264 33Z" fill="${fill}" stroke="${ink}" stroke-width="3"/>`+path('M338 213l48-5',8)+arrow(341,288,341,340)+text(320,385,0);break;
+    case 'network':{
+      const pts=[[170,120],[320,80],[468,130],[447,260],[306,292],[180,250]];
+      art=pts.map(([x,y],i)=>path(`M320 185L${x} ${y}M${x} ${y}L${pts[(i+1)%6][0]} ${pts[(i+1)%6][1]}`,2,.35)).join('');
+      art+=pts.map(([x,y])=>node(x,y,23)).join('')+node(320,185,42)+text(320,361,0);break;
     }
     case 'layers':
-      art=[0,1,2].map(i=>`<path d="M150 ${150+i*68}L320 ${85+i*68}L490 ${150+i*68}L320 ${215+i*68}Z" fill="${i%2?bg:fill}" stroke="${ink}" stroke-width="2.5"/>`+text(320,158+i*68,labels[i],26)).join('');break;
+      art=[0,1,2].map(i=>`<path d="M150 ${133+i*65}L320 ${68+i*65}L490 ${133+i*65}L320 ${198+i*65}Z" fill="${i%2?bg:fill}" stroke="${ink}" stroke-width="3"/>`).join('')+text(320,370,0);break;
     case 'comparison':
-      art=`<rect x="76" y="82" width="216" height="224" rx="22" fill="${fill}"/><rect x="348" y="82" width="216" height="224" rx="22" fill="${fill}"/>`;
-      art+=Array.from({length:9},(_,i)=>`<circle cx="${130+(i%3)*53}" cy="${130+Math.floor(i/3)*57}" r="12" fill="${ink}" opacity=".5"/>`).join('');
-      art+=`<path d="M391 194L430 145L476 235L513 176" fill="none" stroke="${ink}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`;
-      art+=text(184,342,labels[0],26)+text(456,342,labels[1],26)+text(320,382,labels[2],26);break;
+      // Qualitative objects only: fabricated plots would imply evidence we do not have.
+      art=`<rect x="86" y="99" width="203" height="196" rx="28" fill="${fill}"/><rect x="351" y="99" width="203" height="196" rx="28" fill="${fill}"/>`+node(187,194,45)+path('M415 194l39-45 40 45-40 45Z',4)+text(187,341,0)+text(453,341,1)+text(320,383,2,20);break;
     case 'orbit':
-      art=`<ellipse cx="320" cy="195" rx="203" ry="85" fill="none" stroke="${ink}" stroke-width="2" transform="rotate(-25 320 195)" opacity=".4"/><ellipse cx="320" cy="195" rx="203" ry="85" fill="none" stroke="${ink}" stroke-width="2" transform="rotate(25 320 195)" opacity=".4"/>`;
-      art+=node(320,195,61)+node(144,136,23)+node(486,263,23)+`<circle cx="320" cy="195" r="24" fill="${ink}" opacity=".65"/>`;
-      art+=text(135,88,labels[0],26)+text(493,330,labels[1],26)+text(320,375,labels[2],26);break;
+      art=`<ellipse cx="320" cy="190" rx="190" ry="78" fill="none" stroke="${ink}" stroke-width="2" transform="rotate(-25 320 190)" opacity=".4"/><ellipse cx="320" cy="190" rx="190" ry="78" fill="none" stroke="${ink}" stroke-width="2" transform="rotate(25 320 190)" opacity=".4"/>`+node(320,190,53)+node(154,134,22)+node(476,251,22)+text(320,359,0);break;
     default:
-      art=arrow(163,190,270,190)+arrow(371,190,477,190)+node(112,190)+node(320,190)+node(528,190);
-      art+=`<path d="M100 178h24v24h-24zM307 190l13-17 13 17-13 17z" fill="none" stroke="${ink}" stroke-width="3"/><path d="M515 190l9 10 18-22" fill="none" stroke="${ink}" stroke-width="4" stroke-linecap="round"/>`;
-      art+=text(112,280,labels[0],26)+text(320,280,labels[1],26)+text(528,280,labels[2],26);
+      art=arrow(163,175,270,175)+arrow(371,175,477,175)+node(112,175,42)+node(320,175,42)+node(528,175,42)+text(112,272,0)+text(320,272,1)+text(528,272,2);
   }
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420"><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 1L6 4L0 7" fill="none" stroke="${ink}" stroke-width="1.5"/></marker></defs><rect width="640" height="420" rx="20" fill="${bg}"/>${art}<text x="30" y="35" fill="${ink}" opacity=".6" font-family="Arial,Helvetica,sans-serif" font-size="10" letter-spacing="2">CONCEPT ILLUSTRATION</text></svg>`;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420"><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 1L6 4L0 7" fill="none" stroke="${ink}" stroke-width="1.5"/></marker></defs><rect width="640" height="420" rx="20" fill="${bg}"/>${art}<text x="25" y="32" fill="${ink}" opacity=".6" font-family="Arial,Helvetica,sans-serif" font-size="10" letter-spacing="2">CONCEPT ILLUSTRATION</text></svg>`;
   return {url:`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`,caption:spec.caption,kind:'illustration',readable:true};
 }
-// For old bookmarks and a source image that fails to load, retain an honest conceptual cover.
-// Live cards and the current demo provide their own Terra-authored IllustrationSpec.
-export function fallbackSpec(p:Paper):IllustrationSpec {
-  const spec=p.illustration ?? {layout:'pipeline',labels:[p.tags[0]??'Research','New approach','What changes'],accent:'purple',caption:`Concept illustration for ${p.headline}. Not an experimental result.`} as IllustrationSpec;
-  return {...spec,layout:spec.layout==='comparison'?'pipeline':spec.layout};
+export function fallbackSpec(p:Paper):IllustrationSpec{
+  return p.illustration??{layout:'layers',labels:[p.tags[0]??'Research'],accent:'purple',caption:`Concept illustration for ${p.headline}. Not an experimental result.`};
 }
-export function ensureVisual(p:Paper):Paper {
+export function ensureVisual(p:Paper):Paper{
+  if(p.visualPreference==='none')return {...p,figure:undefined};
   return {...p,illustration:fallbackSpec(p),figure:p.figure?.readable?{...p.figure,kind:p.figure.kind??'paper'}:illustrationFigure(fallbackSpec(p))};
 }
