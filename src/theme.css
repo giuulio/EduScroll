@@ -1,0 +1,71 @@
+/* Follow the system appearance on first paint and whenever it changes. */
+:root {
+  color-scheme: light dark;
+  --page: #ffffff;
+  --surface: #ffffff;
+  --surface-muted: #f7f9fa;
+  --elevated: #ffffff;
+  --input: #f3f5f7;
+  --hover: #eff2f4;
+  --active: #edf0f3;
+  --text: #0f1419;
+  --muted: #536471;
+  --line: #e5e9ed;
+  --line-strong: #b8c3cc;
+  --accent: #65478b;
+  --accent-soft: #f4f0f8;
+  --accent-line: #ded3e9;
+  --focus: #80629d;
+  --button: #0f1419;
+  --button-hover: #29343d;
+  --button-text: #ffffff;
+  --disabled: #e5e9ed;
+  --disabled-text: #667580;
+  --success: #28764c;
+  --warning: #7c5914;
+  --error: #a12731;
+  --error-surface: #fff1f2;
+  --error-line: #f0c1c7;
+  --spinner-track: #dce2e7;
+  --selection: #e5d9f0;
+  --selection-text: #251630;
+  --scrim: #0f14196b;
+  --shadow: #0f141926;
+  --mobile-surface: #fffffff2;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #101113;
+    --surface: #101113;
+    --surface-muted: #181b1f;
+    --elevated: #181b1f;
+    --input: #202327;
+    --hover: #23272c;
+    --active: #272b31;
+    --text: #e7e9ea;
+    --muted: #a2adb8;
+    --line: #2f3336;
+    --line-strong: #505861;
+    --accent: #d2b7e6;
+    --accent-soft: #25202d;
+    --accent-line: #4b3c59;
+    --focus: #c8a5df;
+    --button: #e7e9ea;
+    --button-hover: #d5d9dc;
+    --button-text: #0f1419;
+    --disabled: #30353b;
+    --disabled-text: #a2adb8;
+    --success: #8bc5a1;
+    --warning: #e2c58e;
+    --error: #ffb4bb;
+    --error-surface: #342125;
+    --error-line: #714047;
+    --spinner-track: #434950;
+    --selection: #6a4d7d;
+    --selection-text: #ffffff;
+    --scrim: #00000099;
+    --shadow: #00000066;
+    --mobile-surface: #101113f2;
+  }
+}

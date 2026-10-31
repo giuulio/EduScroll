@@ -13,7 +13,7 @@ export function safePublicationUrl(value:string){try{const u=new URL(value);retu
 function readSaved():Paper[]{try{const p=JSON.parse(localStorage.getItem('eduscroll-saved')??'[]');return Array.isArray(p)?p.filter(v=>v&&typeof v.id==='string'&&typeof v.title==='string'&&typeof v.summary==='string'&&Array.isArray(v.authors)&&Array.isArray(v.tags)&&safePublicationUrl(v.url)).slice(0,500).map(p=>ensureVisual(demoPapers.find(d=>d.id===p.id)??p)):[];}catch{return [];}}
 function paperDate(s:string){return new Date(s).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});}
 function sourceName(p:Paper){return p.source==='europepmc'?'Europe PMC':p.source==='openalex'?'OpenAlex':'arXiv';}
-function publicationType(p:Paper){const type=p.publicationType??'';return /preprint/i.test(type)||p.source==='arxiv'?'Preprint':/review|survey/i.test(type)?'Review':/conference/i.test(type)?'Conference paper':'Research article';}
+function publicationType(p:Paper){const type=p.publicationType??'';return /preprint/i.test(type)||p.source==='arxiv'||p.url.startsWith('https://arxiv.org/abs/')?'Preprint':/review|survey/i.test(type)?'Review':/conference/i.test(type)?'Conference paper':'Research article';}
 function authorLine(p:Paper){return p.authors.length>2?`${p.authors[0]} + ${p.authors.length-1}`:p.authors.join(' & ');}
 function appendUnique(old:Paper[],next:Paper[]){const all=new Map(old.map(p=>[p.id,p]));next.forEach(p=>all.set(p.id,p));return [...all.values()];}
 function Sheet({children,close,label,wide=false}:{children:ReactNode;close:()=>void;label:string;wide?:boolean}){
