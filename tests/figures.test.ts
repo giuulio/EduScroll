@@ -9,7 +9,7 @@ const media='s3://pmc-oa-opendata/PMC4853868.1/heart-fig1.jpg?md5=1234';
 const xml='<article><body><fig id="F1"><label>Fig. 1</label><caption><p>A pacemaker device and its electrical response.</p></caption><graphic xlink:href="heart-fig1.jpg"/></fig><fig><caption>Unlisted image must never become a request.</caption><graphic xlink:href="https://evil.test/image.jpg"/></fig></body></article>';
 function paper(id:string):Paper{return {id,title:'A self-powered pacemaker',authors:['Researcher'],published:'2026-10-28',category:'Biomedicine',abstract:'A device was tested in pigs.',url:'https://arxiv.org/abs/'+id,headline:'Heartbeats power a pacemaker',summary:'Heartbeats powered a pacemaker in tests in pigs.',whyItMatters:'',tags:['Pacemakers']};}
 function png(width=1200,height=800){const bytes=new Uint8Array(32);bytes.set([137,80,78,71,13,10,26,10]);const view=new DataView(bytes.buffer);view.setUint32(16,width);view.setUint32(20,height);return bytes;}
-const selection={index:0,readable:true,confidence:.96,crop:null,panel:'',caption:'The tested pacemaker device.',axesAndLegendRetained:true,singlePanel:true};
+const selection={index:0,readable:true,supportsPost:true,confidence:.96,crop:null,panel:'',caption:'The tested pacemaker device.',axesAndLegendRetained:true,singlePanel:true};
 function model(responses:unknown[]){let calls=0;const ai={responses:{parse:async(args:any,options:any)=>{assert.equal(args.store,false);assert.equal(args.model,'gpt-6.1-terra');assert.equal(args.input[0].content.at(-1).detail,'high');assert.ok(options.signal===undefined||options.signal instanceof AbortSignal);return {output_parsed:responses[calls++]};}}} as unknown as OpenAI;return {ai,calls:()=>calls};}
 function arxivDependencies():FigureDependencies{return {arxivArticle:async()=>({text:'Full source text.',sections:['Results'],figures:[{url:'https://arxiv.org/html/2610.99999/figure.png',caption:'A device photograph and graph showing the pacing result.'}]}),fetcher:(async()=>new Response(png(),{headers:{'content-type':'image/png'}})) as typeof fetch};}
 
@@ -55,7 +55,7 @@ test('a proposed crop requires independent confirmation and keeps original image
 });
 
 test('crowded figures and crops that lose axes, fail reinspection or lie outside the image are rejected',async()=>{
- const fixtures=[{...selection,readable:false},{...selection,crop:{x:.8,y:.1,width:.5,height:.5}},{...selection,axesAndLegendRetained:false},{...selection,crop:{x:.1,y:.2,width:.5,height:.5}}];
+ const fixtures=[{...selection,supportsPost:false},{...selection,readable:false},{...selection,crop:{x:.8,y:.1,width:.5,height:.5}},{...selection,axesAndLegendRetained:false},{...selection,crop:{x:.1,y:.2,width:.5,height:.5}}];
  for(const [index,choice] of fixtures.entries()){
   const {ai}=model([choice,{readable:true,singlePanel:true,axesAndLegendRetained:false,confidence:.99}]);assert.equal(await enrichFigure(ai,'gpt-6.1-terra',paper(`2610.9991${index}`),undefined,arxivDependencies()),undefined);
  }

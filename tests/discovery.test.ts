@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {dateBounds,matchesDate,queryConcepts,deduplicatePapers,rankPapers,relevanceScore,fuzzyWordMatch} from '../src/discovery';
-import {discover,discoveredPaperId,europePmcQuery,parseEuropePmc,parseOpenAlex} from '../server/discovery';
+import {dateBounds,matchesDate,queryConcepts,deduplicatePapers,rankPapers,relevanceScore,fuzzyWordMatch,matchesTopic} from '../src/discovery';
+import {discover,getDiscoveredPaper,discoveredPaperId,europePmcQuery,parseEuropePmc,parseOpenAlex} from '../server/discovery';
 import type {Paper} from '../src/types';
 
 const now=new Date('2026-03-01T00:15:00Z');
@@ -20,7 +20,7 @@ test('date ranges use Monday and calendar months at UTC boundaries',()=>{
 });
 
 test('free-form search keeps subjects and expands bounded synonym groups',()=>{
- assert.deepEqual(queryConcepts('novel nanotech for pacemakers'),[['nanotechnology','nanomaterial','nanoscale'],['pacemaker','cardiac pacing']]);
+ assert.deepEqual(queryConcepts('novel nanotech for pacemakers'),[['nanotechnology','nanomaterial','nanoscale','nanogenerator','nanowire','nanoparticle'],['pacemaker','cardiac pacing']]);
  assert.deepEqual(queryConcepts('AI ai'),[['artificial intelligence','machine learning']]);
  assert.equal(queryConcepts('the latest research').length,0);
  const query=europePmcQuery('pacemakers','week',now);
@@ -50,6 +50,26 @@ test('generic typo tolerance accepts a misspelling or letter swap without changi
  assert.ok(relevanceScore(paper('2610.00001','Quantum sensing'),'quantmu sensing')>.9);
 });
 
+test('topic acceptance requires all concepts in public evidence and does not confuse Roman with Raman',()=>{
+ assert.equal(matchesTopic(paper('1','Bright-state Raman atom optics','2026-02-28',{abstract:'A concrete model of scattering.'}),'Roman concrete'),false);
+ assert.equal(matchesTopic(paper('2','Holy Roman Empire','2026-02-28',{abstract:'An executioner worked in a medieval town.'}),'Roman concrete'),false);
+ assert.equal(matchesTopic(paper('3','Roman concrete durability','2026-02-28',{abstract:'Ancient concrete repairs small cracks.'}),'Roman concrete'),true);
+ assert.equal(matchesTopic(paper('4','Optical cardiovascular biosensors'),'nanotech for pacemakers'),false);
+ assert.equal(matchesTopic(paper('5','Nanogenerators for cardiac pacing'),'nanotech for pacemakers'),true);
+ assert.equal(matchesTopic(paper('6','Quantum sensing'),'quantmu sensing'),true);
+ assert.equal(queryConcepts('large language model hallucinations').length,2);
+});
+
+test('OpenAlex retains scholarly articles and preprints but omits generic deposits and non-paper records',()=>{
+ const item={id:'https://openalex.org/W1',title:'Quantum error correction',publication_date:'2026-02-28',type:'article'};
+ assert.equal(parseOpenAlex({results:[{...item,doi:'https://doi.org/10.5281/zenodo.123'}]}).length,0);
+ assert.equal(parseOpenAlex({results:[{...item,type:'dataset'}]}).length,0);
+ assert.equal(parseOpenAlex({results:[{...item,primary_location:{source:{type:'repository',display_name:'Generic research uploads'}}}]}).length,0);
+ const [preprint]=parseOpenAlex({results:[{...item,primary_location:{source:{type:'repository',display_name:'arXiv (Cornell University)'}}}]});
+ assert.equal(preprint.publicationType,'Preprint');
+ assert.equal(parseOpenAlex({results:[{...item,primary_location:{source:{type:'journal',display_name:'Physics journal'}}}]}).length,1);
+});
+
 test('provider parsers retain original metadata and reject malformed source identifiers',()=>{
  const epmc=parseEuropePmc({resultList:{result:[{source:'MED',id:'123',title:'A <i>small</i> pacemaker',firstPublicationDate:'2026-02-28',doi:'10.1234/pacing',abstractText:'Tested in <b>12</b> mice.',authorList:{author:[{fullName:'A Researcher'}]},pubTypeList:{pubType:['Journal Article']}},{source:'https://evil.test',id:'123',title:'Invalid'}]}});
  assert.equal(epmc.length,1);assert.equal(epmc[0].id,'epmc:MED:123');assert.equal(epmc[0].abstract,'Tested in 12 mice.');assert.equal(epmc[0].publicationType,'Journal Article');
@@ -65,7 +85,7 @@ test('empty today results expand explicitly and snapshot pages remain stable wit
   calls++;const url=new URL(String(input));
   if(url.hostname==='export.arxiv.org'){
    const strict=(url.searchParams.get('search_query')??'').includes(`${today.replaceAll('-','')}0000`);
-   const entries=strict?'':Array.from({length:15},(_,i)=>`<entry><id>http://arxiv.org/abs/2501.${String(i+1).padStart(5,'0')}v1</id><title>Nanomaterial pacemaker coating ${i}</title><published>2025-01-01</published><summary>A coating tested with pacing devices.</summary></entry>`).join('');
+   const entries=strict?'':Array.from({length:15},(_,i)=>`<entry><id>http://arxiv.org/abs/2501.${String(i+1).padStart(5,'0')}v1</id><title>Nanomaterial pacemaker coating snapshot fixture cold isolate ${i}</title><published>2025-01-01</published><summary>A coating tested with pacing devices.</summary></entry>`).join('');
    return new Response(`<feed><opensearch:totalResults>${strict?0:15}</opensearch:totalResults>${entries}</feed>`,{headers:{'Content-Type':'application/atom+xml'}});
   }
   if(url.hostname==='www.ebi.ac.uk')return Response.json({resultList:{result:[]}});
@@ -93,4 +113,38 @@ test('empty today results expand explicitly and snapshot pages remain stable wit
   await assert.rejects(discover({topic:'cancelled search',range:'any',sort:'relevance',cursor:0,exclude:[],signal:cancelled.signal}),{name:'AbortError'});
   assert.equal(calls,afterRecovery);
  }finally{globalThis.fetch=originalFetch;}
+});
+
+test('intent screening runs before date expansion and empty-abstract records never take a feed slot',async()=>{
+ const originalFetch=globalThis.fetch;let checked=0;const today=dateBounds('today').to;
+ globalThis.fetch=async(input)=>{
+  const url=new URL(String(input));
+  if(url.hostname==='export.arxiv.org')return new Response('<feed></feed>');
+  if(url.hostname==='api.openalex.org')return Response.json({results:[]});
+  if(url.hostname==='www.ebi.ac.uk'){
+   const strict=(url.searchParams.get('query')??'').includes(`FIRST_PDATE:[${today}`);
+   return Response.json({resultList:{result:strict?[
+    {source:'MED',id:'1001',title:'Roman concrete keyword fixture',firstPublicationDate:today,abstractText:''},
+    {source:'MED',id:'1002',title:'Roman novels and concrete ideas',firstPublicationDate:today,abstractText:'A literary analysis with matching words used in a different sense.'},
+   ]:[{source:'MED',id:'1003',title:'Ancient Roman concrete masonry',firstPublicationDate:'2020-01-01',abstractText:'Researchers examined mineral growth in cracks in ancient Roman concrete masonry.'}]}});
+  }
+  throw new Error('Unexpected provider');
+ };
+ try{
+  const result=await discover({topic:'Roman concrete intent regression',range:'today',sort:'relevance',cursor:0,exclude:[],selectPapers:async(papers)=>{
+   checked++;assert.ok(papers.every(p=>p.abstract.length>=20));return papers.filter(p=>p.id==='epmc:MED:1003');
+  }});
+  assert.equal(checked,2);assert.equal(result.expanded,true);assert.deepEqual(result.papers.map(p=>p.id),['epmc:MED:1003']);
+  const cached=await discover({topic:'Roman concrete intent regression',range:'today',sort:'relevance',cursor:0,exclude:[],snapshot:result.snapshot,selectPapers:async()=>{throw new Error('Do not rescreen cached snapshots');}});
+  assert.deepEqual(cached.papers,result.papers);
+ }finally{globalThis.fetch=originalFetch;}
+});
+
+test('cold Europe PMC lookups use unquoted identifiers so bookmarks work on a fresh server',async()=>{
+ const originalFetch=globalThis.fetch;
+ globalThis.fetch=async(input)=>{
+  const url=new URL(String(input));assert.equal(url.searchParams.get('query'),'EXT_ID:987654321 AND SRC:MED');
+  return Response.json({resultList:{result:[{id:'987654321',source:'MED',title:'A retained research paper',firstPublicationDate:'2026-01-01',abstractText:'The original public abstract remains available.'}]}});
+ };
+ try{assert.equal((await getDiscoveredPaper('epmc:MED:987654321')).id,'epmc:MED:987654321');}finally{globalThis.fetch=originalFetch;}
 });

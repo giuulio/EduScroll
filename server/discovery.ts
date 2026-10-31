@@ -1,9 +1,10 @@
 import type {FeedResult,Paper} from '../src/types';
-import {dateBounds,matchesDate,normalizedText,paperIdentity,queryConcepts,rankPapers,type DateRange,type SortOrder} from '../src/discovery';
+import {dateBounds,matchesDate,matchesTopic,normalizedText,paperIdentity,queryConcepts,rankPapers,type DateRange,type SortOrder} from '../src/discovery';
 import {clean,getPaper,paperIdPattern,searchArxiv} from './papers';
 
 export interface DiscoveryRequest {
  topic:string;range:DateRange;sort:SortOrder;cursor:number;exclude:string[];snapshot?:string;signal?:AbortSignal;
+ selectPapers?:(papers:Paper[],signal?:AbortSignal)=>Promise<Paper[]>;
 }
 type Snapshot={id:string;topic:string;range:DateRange;sort:SortOrder;papers:Paper[];expires:number;day:string;effectiveRange:DateRange;message?:string;sourceWarnings:string[]};
 const snapshots=new Map<string,Snapshot>();
@@ -62,14 +63,21 @@ export function parseOpenAlex(data:any):Paper[]{
   const externalId=clean(entry.id).match(/^https:\/\/openalex\.org\/(W\d+)$/)?.[1];
   const title=sourceText(entry.title??entry.display_name);if(!externalId||!title)return [];
   const doi=doiFor(entry.doi);
-  return [{id:`openalex:${externalId}`,title,authors:(Array.isArray(entry.authorships)?entry.authorships:[]).map((authorship:any)=>sourceText(authorship.author?.display_name)).filter(Boolean).slice(0,12),published:clean(entry.publication_date??entry.publication_year),category:sourceText(entry.primary_topic?.subfield?.display_name??entry.primary_topic?.display_name)||'Research',abstract:abstractFromIndex(entry.abstract_inverted_index),url:doi?`https://doi.org/${doi}`:`https://openalex.org/${externalId}`,source:'openalex' as const,publicationType:sourceText(entry.type).replaceAll('-',' ')||'Research article',...(doi?{doi}:{}),...blankPost()}];
+  const type=sourceText(entry.type);
+  // OpenAlex also indexes datasets, books and arbitrary repository deposits, sometimes as articles.
+  // A DOI alone does not identify a scholarly publication. Keep journals/conferences and recognised preprint archives.
+  const location=entry.primary_location?.source;
+  const archive=/\b(?:arxiv|biorxiv|medrxiv|chemrxiv|ssrn|research square|preprints\.org)\b/i.test(sourceText(location?.display_name));
+  const deposit=Boolean(doi&&/^10\.(?:5281\/zenodo\.|6084\/m9\.figshare\.)/i.test(doi))||(location?.type==='repository'&&!archive);
+  if(deposit||type&&!['article','review','preprint','conference-paper'].includes(type))return [];
+  return [{id:`openalex:${externalId}`,title,authors:(Array.isArray(entry.authorships)?entry.authorships:[]).map((authorship:any)=>sourceText(authorship.author?.display_name)).filter(Boolean).slice(0,12),published:clean(entry.publication_date??entry.publication_year),category:sourceText(entry.primary_topic?.subfield?.display_name??entry.primary_topic?.display_name)||'Research',abstract:abstractFromIndex(entry.abstract_inverted_index),url:doi?`https://doi.org/${doi}`:`https://openalex.org/${externalId}`,source:'openalex' as const,publicationType:archive?'Preprint':type.replaceAll('-',' ')||'Research article',...(doi?{doi}:{}),...blankPost()}];
  });
 }
 async function openAlex(topic:string,range:DateRange,_sort:SortOrder,signal?:AbortSignal):Promise<Paper[]>{
  const url=new URL('https://api.openalex.org/works');const {from,to}=dateBounds(range);
  const filter=[...(from?[`from_publication_date:${from}`]:[]),`to_publication_date:${to}`].join(',');
  // Semantic search handles unfamiliar concepts and different wording without an LLM call.
- url.search=new URLSearchParams({'search.semantic':topic,filter,per_page:'24',select:'id,doi,title,authorships,publication_date,publication_year,primary_topic,type,abstract_inverted_index'}).toString();
+ url.search=new URLSearchParams({'search.semantic':topic,filter,per_page:'24',select:'id,doi,title,authorships,publication_date,publication_year,primary_topic,type,primary_location,abstract_inverted_index'}).toString();
  const deadline=boundedSignal(signal);
  try{return parseOpenAlex(await sourceJson(url,AbortSignal.any([deadline,AbortSignal.timeout(4500)])));}
  catch{
@@ -87,7 +95,8 @@ async function candidates(topic:string,range:DateRange,sort:SortOrder,signal?:Ab
  signal?.throwIfAborted();
  const papers:Paper[]=[];const warnings:string[]=[];let successful=0;
  results.forEach((result,index)=>{if(result.status==='fulfilled'){successful++;papers.push(...result.value);}else warnings.push(`${names[index]} is temporarily unavailable.`);});
- return {papers:papers.filter(paper=>matchesDate(paper.published,range)),warnings,successful};
+ // Filter BEFORE date expansion, ranking and pagination. Unrelated hits and empty abstracts must not suppress real older matches.
+ return {papers:papers.filter(paper=>matchesDate(paper.published,range)&&paper.abstract.trim().length>=20),warnings,successful};
 }
 
 function page(snapshot:Snapshot,request:DiscoveryRequest):FeedResult{
@@ -118,11 +127,17 @@ export async function discover(request:DiscoveryRequest):Promise<FeedResult>{
  }
  const existing=Array.from(snapshots.values()).find(snapshot=>snapshot.topic===normalizedText(topic)&&snapshot.range===request.range&&snapshot.sort===request.sort);
  if(existing)return recoveredPage(existing,request,recovered);
- const found=await candidates(topic,request.range,request.sort,request.signal);
+ const relevant=async(range:DateRange)=>{
+  const result=await candidates(topic,range,request.sort,request.signal);
+  const ranked=rankPapers(result.papers,topic,request.sort);
+  const papers=request.selectPapers?await request.selectPapers(ranked.slice(0,36),request.signal):ranked.filter(paper=>matchesTopic(paper,topic));
+  return {...result,papers};
+ };
+ const found=await relevant(request.range);
  if(!found.successful)throw Object.assign(new Error('Research sources are temporarily unavailable. Try again shortly.'),{status:502});
  let papers=found.papers;let effectiveRange=request.range;let message:string|undefined;const sourceWarnings=[...found.warnings];
  if(!papers.length&&request.range!=='any'){
-  const expanded=await candidates(topic,'any',request.sort,request.signal);
+  const expanded=await relevant('any');
   sourceWarnings.push(...expanded.warnings);
   if(expanded.papers.length){papers=expanded.papers;effectiveRange='any';const label=request.range==='today'?'today':request.range==='week'?'this week':'this month';message=`No matches ${label}. Showing related research from all dates.`;}
  }
@@ -137,7 +152,7 @@ export async function getDiscoveredPaper(id:string,signal?:AbortSignal):Promise<
  const hit=known.get(id);if(hit&&hit.expires>Date.now())return hit.paper;if(hit)known.delete(id);
  if(paperIdPattern.test(id))return getPaper(id,signal);
  let papers:Paper[]=[];const epmc=id.match(epmcPattern);const openalex=id.match(openalexPattern);
- if(epmc){const url=new URL('https://www.ebi.ac.uk/europepmc/webservices/rest/search');url.search=new URLSearchParams({query:`EXT_ID:"${epmc[2]}" AND SRC:${epmc[1]}`,format:'json',resultType:'core',pageSize:'1'}).toString();papers=parseEuropePmc(await sourceJson(url,signal));}
+ if(epmc){const url=new URL('https://www.ebi.ac.uk/europepmc/webservices/rest/search');url.search=new URLSearchParams({query:`EXT_ID:${epmc[2]} AND SRC:${epmc[1]}`,format:'json',resultType:'core',pageSize:'1'}).toString();papers=parseEuropePmc(await sourceJson(url,signal));}
  if(openalex){const url=new URL(`https://api.openalex.org/works/${openalex[1]}`);const result=await sourceJson(url,signal);papers=parseOpenAlex({results:[result]});}
  const paper=papers.find(paper=>paper.id===id);if(!paper)throw Object.assign(new Error('This paper could not be found at its original source.'),{status:404});remember([paper]);return paper;
 }

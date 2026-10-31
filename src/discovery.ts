@@ -29,8 +29,8 @@ export function normalizedText(value:string):string{
 const stopWords=new Set('a an and are as at be by can could do does for from how i in into is it latest me new novel of on or papers research recent show some studies study that the their these this to using want what with'.split(' '));
 const synonyms:Record<string,string[]>={
  ai:['artificial intelligence','machine learning'],
- llm:['large language model','language model'],llms:['large language model','language model'],
- nanotech:['nanotechnology','nanomaterial','nanoscale'],nanotechnology:['nanotechnology','nanomaterial','nanoscale'],
+ llm:['large language model','language model','llm'],llms:['large language model','language model','llm'],
+ nanotech:['nanotechnology','nanomaterial','nanoscale','nanogenerator','nanowire','nanoparticle'],nanotechnology:['nanotechnology','nanomaterial','nanoscale','nanogenerator','nanowire','nanoparticle'],
  nanomaterials:['nanomaterial','nanotechnology','nanoscale'],
  pacemaker:['pacemaker','cardiac pacing'],pacemakers:['pacemaker','cardiac pacing'],
  robotics:['robot','robotics'],robots:['robot','robotics'],robot:['robot','robotics'],
@@ -39,21 +39,29 @@ const synonyms:Record<string,string[]>={
  ageing:['ageing','aging'],aging:['ageing','aging'],
  solar:['solar','photovoltaic'],photovoltaics:['photovoltaic','solar'],
  neurotech:['neurotechnology','brain computer interface'],
+ hallucinations:['hallucination','fabricated content','factual error'],hallucination:['hallucination','fabricated content','factual error'],
 };
 
 /** Keep independent concepts ANDed while accepting synonyms within a concept. */
 export function queryConcepts(topic:string):string[][]{
- const words=normalizedText(topic).split(' ').filter(Boolean);
+ // A named concept counts once, rather than letting generic words swamp its subject.
+ const words=normalizedText(topic).replace(/\blarge language models?\b/g,'llm').replace(/\bartificial intelligence\b/g,'ai').split(' ').filter(Boolean);
  const concepts=words.filter(w=>!stopWords.has(w)).slice(0,8).map(word=>synonyms[word]??[word]);
  const unique=new Set<string>();
  return concepts.filter(group=>{const key=group.join('|');if(unique.has(key))return false;unique.add(key);return true;});
 }
 
-function termMatches(text:string,term:string):boolean{
+/** Retrieval services can match full text or merely similar topics. Require visible evidence for every concept. */
+export function matchesTopic(paper:Paper,topic:string):boolean{
+ const groups=queryConcepts(topic);const text=normalizedText(`${paper.title} ${paper.abstract}`);
+ return groups.length>0&&groups.every(group=>group.some(term=>termMatches(text,term,7)));
+}
+
+function termMatches(text:string,term:string,minimumFuzzyLength=5):boolean{
  const normalized=normalizedText(term);
  // Prefix matching admits plurals and common endings without matching inside words.
  return text.split(' ').some((_,i,words)=>normalized.split(' ').every((part,j)=>{
-  const word=words[i+j]??'';return word.startsWith(part)||fuzzyWordMatch(word,part);
+  const word=words[i+j]??'';return word===part||(word.startsWith(part)&&/^(?:s|es|ed|ing|al|ic|s?based)$/.test(word.slice(part.length)))||(Math.min(word.length,part.length)>=minimumFuzzyLength&&fuzzyWordMatch(word,part));
  }));
 }
 

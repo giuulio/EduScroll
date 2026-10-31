@@ -13,6 +13,7 @@ test('source figures are preserved and labelled as original',()=>{
 test('all illustration layouts are standalone images and contain no remote dependencies',()=>{
  for(const layout of illustrationLayouts){
   const result=illustrationFigure({...spec,layout});const svg=decodeURIComponent(result.url.split(',').slice(1).join(','));assert.match(svg,/viewBox="0 0 640 420"/);assert.match(svg,/CONCEPT ILLUSTRATION/);assert.ok(!svg.includes('<image'));assert.ok(!svg.includes('href='));assert.match(svg,/<\/svg>$/);
+  for(const label of spec.labels)assert.ok(svg.includes(`>${label}</text>`),`${layout} dropped the label ${label}`);
  }
 });
 test('model-supplied labels cannot inject executable markup',()=>{

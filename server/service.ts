@@ -1,13 +1,14 @@
 import OpenAI from 'openai';
 import {z} from 'zod';
 import {zodTextFormat} from 'openai/helpers/zod';
-import type {Detail,FeedResult,Paper,TopicOverview} from '../src/types';
+import type {Detail,FeedResult,Paper,TopicOverview,FeedEvent} from '../src/types';
 import {discover,getDiscoveredPaper} from './discovery';
 import {fullPaper,paperIdPattern} from './papers';
 import {generateTextPosts,plainWritingRules} from './posts';
 import {editorialVersion} from './editorial';
 import {enrichFigure,figureProtocolVersion} from './figures';
 import {generateTopicOverview,sourceOverview,overviewVersion} from './overview';
+import {selectRelevantPapers} from './relevance';
 import {PublicCache,digest} from './cache';
 import {allowedModels,hostedOrigins,localOrigins,RequestLimits,ServiceError,boundedJson,safeError} from './security';
 import type {Model} from './security';
@@ -25,7 +26,7 @@ export type ServiceOptions={
  createClient?:(key:string)=>OpenAI;discovery?:typeof discover;lookupPaper?:typeof getDiscoveredPaper;fullText?:typeof fullPaper;writePosts?:typeof generateTextPosts;writeOverview?:typeof generateTopicOverview;enrichFigure?:typeof enrichFigure;
 };
 export type RequestContext={ip?:string};
-type StreamEvent={type:'status';message:string}|{type:'card';paper:Paper}|{type:'complete';result:FeedResult}|{type:'error';error:string}|{type:'overview';overview:TopicOverview}|{type:'figure';id:string;figure:NonNullable<Paper['figure']>}|{type:'visual-status';id:string;status:'loading'|'ready'|'unavailable'};
+type StreamEvent=FeedEvent;
 function contentFields(paper:Paper):ContentFields {
  const p=paper as Paper&ContentFields;
  return {headline:p.headline,summary:p.summary,whyItMatters:p.whyItMatters,tags:p.tags,figure:p.figure,illustration:p.illustration,evidence:p.evidence,visualPreference:p.visualPreference,contentBasis:p.contentBasis};
@@ -59,12 +60,20 @@ export function createService(options:ServiceOptions){
  async function prepareFeed(data:z.infer<typeof feedSchema>,ai:OpenAI,model:Model,signal:AbortSignal,send?:(event:StreamEvent)=>void):Promise<FeedResult>{
   signal.throwIfAborted();send?.({type:'status',message:'Finding research…'});
   const range=data.range??(data.days===1?'today':data.days===30?'month':'week');
-  const found=await search({topic:data.topic,range,sort:data.sort,cursor:data.cursor,exclude:data.exclude,signal,...(data.snapshot?{snapshot:data.snapshot}:{})});
+  const found=await search({topic:data.topic,range,sort:data.sort,cursor:data.cursor,exclude:data.exclude,signal,...(data.snapshot?{snapshot:data.snapshot}:{}),selectPapers:async(papers)=>{
+   if(!papers.length)return [];
+   const selectionSignal=AbortSignal.any([signal,AbortSignal.timeout(10_000)]);
+   send?.({type:'status',message:'Checking topic matches…'});
+   try{return await abortable(selectRelevantPapers(ai,model,data.topic,papers,selectionSignal),selectionSignal);}
+   catch(error){signal.throwIfAborted();if([401,403,429].includes((error as {status?:number})?.status??0))throw error;throw new ServiceError(502,'Topic matching could not finish. Please retry.');}
+  }});
+  send?.({type:'metadata',message:found.message,sourceWarnings:found.sourceWarnings});
   signal.throwIfAborted();const workCancellation=new AbortController();signal=AbortSignal.any([signal,workCancellation.signal]);
   const eligible=found.papers.filter(paper=>paper.abstract.trim().length>=20);
   const skipped=found.papers.length-eligible.length;
   const keyed=await Promise.all(eligible.map(async paper=>({paper,key:`${editorialVersion}:${model}:${await digest(JSON.stringify([paper.id,paper.updated??paper.published,paper.title,paper.abstract]))}`})));
   const ready=new Map<string,Paper>();const figures=new Map<string,NonNullable<Paper['figure']>>();
+  const textReady=new Map(keyed.map(({paper})=>{let resolve!:(value:Paper)=>void;const promise=new Promise<Paper>(done=>{resolve=done;});return [paper.id,{promise,resolve}] as const;}));
   let nextEmit=0;
   const flushReady=()=>{
    while(nextEmit<keyed.length){const paper=ready.get(keyed[nextEmit].paper.id);if(!paper)break;signal.throwIfAborted();send?.({type:'card',paper});nextEmit++;}
@@ -98,8 +107,12 @@ export function createService(options:ServiceOptions){
     const key=`${figureProtocolVersion}:${model}:${item.key}`;
     let figure=figureCache.get(key);
     if(figure===undefined){
-     const singleSignal=AbortSignal.any([mediaSignal,AbortSignal.timeout(20_000)]);
-     try{figure=await abortable(illustrate(ai,model,plainPaper(item.paper),singleSignal),singleSignal)??null;if(!singleSignal.aborted)figureCache.set(key,figure);}
+     try{
+      // Select against the actual post, not a different result somewhere in its abstract.
+      const post=await abortable(textReady.get(item.paper.id)!.promise,mediaSignal);
+      const singleSignal=AbortSignal.any([mediaSignal,AbortSignal.timeout(20_000)]);
+      figure=await abortable(illustrate(ai,model,plainPaper(post),singleSignal),singleSignal)??null;if(!singleSignal.aborted)figureCache.set(key,figure);
+     }
      catch{figure=null;}
     }
     signal.throwIfAborted();
@@ -113,7 +126,8 @@ export function createService(options:ServiceOptions){
   for(const item of keyed)send?.({type:'visual-status',id:item.paper.id,status:'loading'});
   const mediaTasks=Array.from({length:Math.min(2,keyed.length)},()=>mediaWorker());
   let nextBatch=0;
-  const batches:typeof keyed[]=[];for(let offset=0;offset<keyed.length;offset+=3)batches.push(keyed.slice(offset,offset+3));
+  // Release the first ranked post after one card's generation, rather than a full three-card batch.
+  const batches:typeof keyed[]=keyed.length?[keyed.slice(0,1)]:[];for(let offset=1;offset<keyed.length;offset+=3)batches.push(keyed.slice(offset,offset+3));
   const textWorker=async()=>{
    while(nextBatch<batches.length){
     signal.throwIfAborted();const batch=batches[nextBatch++];const missing=batch.filter(item=>!posts.get(item.key));
@@ -123,20 +137,24 @@ export function createService(options:ServiceOptions){
      signal.throwIfAborted();const byId=new Map(written.map(p=>[p.id,p]));
      for(const item of missing){const post=byId.get(item.paper.id);if(!post)throw new ServiceError(502,'Some research posts could not be prepared. Please retry.');posts.set(item.key,contentFields(post));}
     }
-    for(const item of batch){signal.throwIfAborted();const paper=assemble(item.paper,posts.get(item.key)!);ready.set(paper.id,paper);known.set(paper.id,plainPaper(paper));}flushReady();
+    for(const item of batch){signal.throwIfAborted();const paper=assemble(item.paper,posts.get(item.key)!);ready.set(paper.id,paper);known.set(paper.id,plainPaper(paper));textReady.get(paper.id)!.resolve(paper);}flushReady();
    }
   };
   const textWorkers=Array.from({length:Math.min(Math.max(1,Math.min(2,options.textConcurrency??2)),batches.length)},()=>textWorker().catch(error=>{workCancellation.abort(error);throw error;}));
-  void Promise.all(textWorkers).then(()=>{if(!signal.aborted)send?.({type:'status',message:'Posts are ready. Selecting readable figures…'});}).catch(()=>{});
+  const result=():FeedResult=>{
+   const papers=eligible.flatMap(paper=>{const value=ready.get(paper.id);return value?[value]:[];});
+   const message=[found.message,skipped?`${skipped} ${skipped===1?'result has':'results have'} no usable abstract and ${skipped===1?'was':'were'} skipped.`:undefined].filter(Boolean).join(' ');
+   return {...found,papers,mode:'live',...(overview?{overview}:{}),...(message?{message}:{})};
+  };
+  // Pagination becomes usable as soon as text is ready; optional media keeps patching cards.
+  void Promise.all([...textWorkers,overviewTask]).then(()=>{if(!signal.aborted)send?.({type:'posts-ready',result:result()});}).catch(()=>{});
   // Attach handlers to every independent task before waiting, so cancellation never leaks rejections.
   const tasks=[...textWorkers,overviewTask,...mediaTasks];
   const outcomes=await Promise.allSettled(tasks);
   signal.throwIfAborted();
   for(let index=0;index<textWorkers.length;index++)if(outcomes[index].status==='rejected')throw (outcomes[index] as PromiseRejectedResult).reason;
   for(const item of keyed.slice(nextFigure))send?.({type:'visual-status',id:item.paper.id,status:'unavailable'});
-  const papers=eligible.flatMap(paper=>{const value=ready.get(paper.id);return value?[value]:[];});
-  const message=[found.message,skipped?`${skipped} ${skipped===1?'result has':'results have'} no usable abstract and ${skipped===1?'was':'were'} skipped.`:undefined].filter(Boolean).join(' ');
-  return {...found,papers,mode:'live',...(overview?{overview}:{}),...(message?{message}:{})};
+  return result();
  }
 
  async function prepareDetail(id:string,ai:OpenAI,model:Model,signal:AbortSignal):Promise<Detail>{

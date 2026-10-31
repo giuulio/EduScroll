@@ -53,17 +53,18 @@ test('connection validates only an allowlisted model, isolates keys and redacts 
  assert.deepEqual(used,[fakeKey,otherKey]);assert.deepEqual(models,['gpt-6-luna','gpt-6.1-terra']);
 });
 
-test('NDJSON delivers first three cards before waiting for the next batch, with snapshot metadata intact',async()=>{
+test('NDJSON delivers the first card before waiting for the rest, with snapshot metadata intact',async()=>{
  let finishLast!:()=>void;const lastBatch=new Promise<void>(resolve=>{finishLast=resolve;});const calls:number[]=[];
  const papers=[paper,publicPaper('2610.12346v1'),publicPaper('2610.12347v1'),publicPaper('2610.12348v1')];
  const handle=createService({...baseOptions,discovery:async()=>({papers,nextCursor:4,hasMore:true,mode:'live',snapshot:'stable-order',requestedRange:'today',effectiveRange:'any',expanded:true,message:'Showing older matches.'}),writePosts:async(_ai,_model,batch)=>{calls.push(batch.length);if(calls.length===2)await lastBatch;return batch.map(written);}});
  const response=await handle(request('/api/feed',{topic:'robots',range:'today'},fakeKey,{headers:{Accept:'application/x-ndjson'}}));assert.match(response.headers.get('content-type')??'',/ndjson/);
  const reader=response.body!.getReader();const decoder=new TextDecoder();const lines:string[]=[];let text='';
- while(lines.filter(line=>JSON.parse(line).type==='card').length<3){const chunk=await reader.read();assert.equal(chunk.done,false);text+=decoder.decode(chunk.value,{stream:true});const split=text.split('\n');text=split.pop()!;lines.push(...split.filter(Boolean));}
- assert.equal(lines.some(line=>JSON.parse(line).type==='complete'),false);finishLast();
+ while(lines.filter(line=>JSON.parse(line).type==='card').length<1){const chunk=await reader.read();assert.equal(chunk.done,false);text+=decoder.decode(chunk.value,{stream:true});const split=text.split('\n');text=split.pop()!;lines.push(...split.filter(Boolean));}
+ assert.equal(lines.some(line=>JSON.parse(line).type==='complete'),false);
+ assert.equal(lines.map(line=>JSON.parse(line)).find(event=>event.type==='metadata').message,'Showing older matches.');finishLast();
  for(;;){const chunk=await reader.read();if(chunk.done)break;text+=decoder.decode(chunk.value,{stream:true});}
  lines.push(...text.split('\n').filter(Boolean));const events=lines.map(line=>JSON.parse(line));
- assert.deepEqual(calls,[3,1]);assert.equal(events.filter(event=>event.type==='card').length,4);
+ assert.deepEqual(calls,[1,3]);assert.equal(events.filter(event=>event.type==='card').length,4);
  const result=events.find(event=>event.type==='complete').result as FeedResult;assert.equal(result.snapshot,'stable-order');assert.equal(result.expanded,true);assert.equal(result.papers.length,4);assert.equal(result.nextCursor,4);
 });
 
@@ -141,17 +142,19 @@ test('text cards arrive before slow figure selection and late crop patches survi
  const handle=createService({...baseOptions,enrichFigure:async()=>{selecting=true;await gate;return sourceFigure;}});
  const response=await handle(request('/api/feed',{topic:'robots'},fakeKey,{headers:{Accept:'application/x-ndjson'}}));const reader=response.body!.getReader();const decoder=new TextDecoder();let content='';
  while(!content.includes('"type":"card"')){const chunk=await reader.read();assert.equal(chunk.done,false);content+=decoder.decode(chunk.value);}
- assert.equal(selecting,true);assert.equal(content.includes('"type":"complete"'),false);releaseFigure();
+ assert.equal(selecting,true);assert.equal(content.includes('"type":"complete"'),false);
+ while(!content.includes('"type":"posts-ready"')){const chunk=await reader.read();assert.equal(chunk.done,false);content+=decoder.decode(chunk.value);}
+ const early=content.split('\n').filter(Boolean).map(line=>JSON.parse(line)).find(event=>event.type==='posts-ready');assert.equal(early.result.nextCursor,1);assert.equal(early.result.papers.length,1);assert.equal(content.includes('"type":"figure"'),false);releaseFigure();
  for(;;){const chunk=await reader.read();if(chunk.done)break;content+=decoder.decode(chunk.value);}
  const events=content.split('\n').filter(Boolean).map(line=>JSON.parse(line));assert.deepEqual(events.find(event=>event.type==='figure').figure.crop,sourceFigure.crop);
  const final=events.find(event=>event.type==='complete').result.papers[0];assert.equal(final.figure.kind,'paper');assert.equal(final.visualPreference,undefined);
 });
 
-test('a figure that finishes before text is retained in the card and final ordered results',async()=>{
- const handle=createService({...baseOptions,enrichFigure:async()=>sourceFigure,writePosts:async(_ai,_model,batch)=>{await new Promise(resolve=>setTimeout(resolve,5));return batch.map(written);}});
+test('figure selection receives the written post and its patch survives the final result',async()=>{
+ const handle=createService({...baseOptions,enrichFigure:async(_ai,_model,post)=>{assert.equal(post.summary,written(paper).summary);return sourceFigure;},writePosts:async(_ai,_model,batch)=>{await new Promise(resolve=>setTimeout(resolve,5));return batch.map(written);}});
  const events=await streamEvents(await handle(request('/api/feed',{topic:'robots'},fakeKey,{headers:{Accept:'application/x-ndjson'}})));
- assert.equal(events.findIndex(event=>event.type==='figure')<events.findIndex(event=>event.type==='card'),true);
- assert.equal(events.find(event=>event.type==='card').paper.figure.url,sourceFigure.url);assert.equal(events.at(-1).result.papers[0].figure.url,sourceFigure.url);
+ assert.equal(events.findIndex(event=>event.type==='figure')>events.findIndex(event=>event.type==='card'),true);
+ assert.equal(events.find(event=>event.type==='card').paper.figure,undefined);assert.equal(events.at(-1).result.papers[0].figure.url,sourceFigure.url);
 });
 
 test('overview and figure failures do not fail readable posts',async()=>{

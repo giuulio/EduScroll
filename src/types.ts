@@ -24,5 +24,7 @@ export interface FeedResult {
 export type ModelName='gpt-6.1-terra'|'gpt-6-luna';
 export type FeedEvent=
  |{type:'status';message:string}|{type:'card';paper:Paper}|{type:'complete';result:FeedResult}|{type:'error';error:string}
+ |{type:'metadata';message?:string;sourceWarnings?:string[]}
+ |{type:'posts-ready';result:FeedResult}
  |{type:'overview';overview:TopicOverview}|{type:'figure';id:string;figure:PaperFigure}
  |{type:'visual-status';id:string;status:'loading'|'ready'|'unavailable'};
